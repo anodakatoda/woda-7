@@ -1,6 +1,6 @@
-# 💧 Woda 7 – Rozliczenie Wspólnoty (Słowackiego 7)
+# 💧 Woda 7 – Rozliczenie Wspólnoty
 
-Współczesna, lekka aplikacja typu **PWA (Progressive Web App)** stworzona do zarządzania i rozliczania mediów (woda oraz ścieki) w kameralnej wspólnocie mieszkaniowej składającej się z 6 lokali (`7/1`, `7/2`, `7A/1`, `7A/2`, `7B/1`, `7B/2`). Projekt powstał z myślą o pełnej transparentności, matematycznej precyzji oraz wygodzie użytkowania na urządzeniach mobilnych i tabletach.
+Współczesna, lekka aplikacja typu **PWA (Progressive Web App)** stworzona do zarządzania i rozliczania mediów (woda oraz ścieki) w kameralnej wspólnocie mieszkaniowej składającej się z 6 lokali. Projekt powstał z myślą o pełnej transparentności, matematycznej precyzji oraz wygodzie użytkowania na urządzeniach mobilnych i tabletach.
 
 ---
 
