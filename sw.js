@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wsp7-cache-v5';
+const CACHE_NAME = 'wsp7-cache-v6';
 const ASSETS = [
   './',
   './index.html',

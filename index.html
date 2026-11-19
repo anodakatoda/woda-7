@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <title>Woda 7 – Rozliczenia</title>
-<!-- v25 -->
+<!-- v26 -->
 <style>
 :root {
   --bg: #f4f7fb;
@@ -350,6 +350,7 @@ input[readonly] { background: #f1f5f9; color: var(--muted); cursor: not-allowed;
 /* Przyciski */
 .btn {
   display: inline-flex;
+  min-width: 0;
   align-items: center;
   justify-content: center;
   gap: 6px;
@@ -902,9 +903,9 @@ input[readonly] { background: #f1f5f9; color: var(--muted); cursor: not-allowed;
       <p style="font-size:12px;color:var(--muted);margin:0 0 12px">
         Zapisz bazę <code>.json</code> we wskazanym folderze telefonu lub wczytaj ją z pliku. Każde zapisane rozliczenie zachowuje pełną ciągłość stanów i dat.
       </p>
-      <div class="grid-2" style="margin-bottom:0">
-        <button type="button" id="btn-export-file" class="btn btn-emerald">💾 Eksportuj bazę</button>
-        <button type="button" id="btn-import-file" class="btn btn-outline">📂 Importuj z pliku</button>
+      <div class="grid-2" style="margin-bottom:0;grid-template-columns:1fr 1fr;gap:8px">
+        <button type="button" id="btn-export-file" class="btn btn-emerald" style="min-width:0;padding:12px 8px;font-size:12.5px">💾 Eksportuj bazę</button>
+        <button type="button" id="btn-import-file" class="btn btn-outline" style="min-width:0;padding:12px 8px;font-size:12.5px">📂 Importuj z pliku</button>
       </div>
       <input type="file" id="file-db-import" accept=".json,application/json,text/plain" hidden>
     </div>
