@@ -1,0 +1,3037 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="theme-color" content="#f8fafc">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Woda 7 – Rozliczenia</title>
+<!-- v25 -->
+<style>
+:root {
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --surface-soft: #f8fafc;
+  --ink: #0f172a;
+  --ink-sub: #475569;
+  --muted: #64748b;
+  --accent: #0284c7;
+  --accent-dark: #0369a1;
+  --accent-soft: #e0f2fe;
+  --accent-border: #bae6fd;
+  --emerald: #059669;
+  --emerald-soft: #ecfdf5;
+  --emerald-border: #a7f3d0;
+  --amber: #d97706;
+  --amber-soft: #fffbeb;
+  --amber-border: #fde68a;
+  --red: #dc2626;
+  --red-soft: #fef2f2;
+  --border: #e2e8f0;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 9px;
+  --shadow: 0 2px 12px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.4;
+  padding-bottom: 48px;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 480px; margin: 0 auto; padding: 10px 12px; }
+
+/* Nowa, lekka i czytelna szata nagłówka – nic się nie ucina */
+.app-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.brand-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  flex-shrink: 0;
+}
+.brand-text { min-width: 0; }
+.brand-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+.brand-sub {
+  font-size: 11.5px;
+  color: var(--muted);
+  display: block;
+  font-weight: 600;
+  margin-top: 1px;
+}
+.btn-new-inv {
+  background: var(--surface-soft);
+  color: var(--accent-dark);
+  border: 1.5px solid var(--accent-border);
+  padding: 8px 11px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.btn-new-inv:active { background: var(--accent-soft); }
+
+/* Nawigacja – łagodny, nieinwazyjny kolor aktywnej zakładki */
+.nav {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  background: var(--surface);
+  padding: 5px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.nav-btn {
+  position: relative;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 7px 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  border-radius: 9px;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.15s;
+}
+.nav-btn .ico {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 2px;
+  line-height: 1.1;
+  opacity: 0.8;
+}
+.nav-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  border-color: var(--accent-border);
+  font-weight: 800;
+}
+.nav-btn.active .ico { opacity: 1; }
+.nav-badge {
+  display: inline-block;
+  background: #e2e8f0;
+  color: var(--ink-sub);
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 99px;
+  margin-left: 2px;
+  vertical-align: middle;
+}
+.nav-btn.active .nav-badge {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Alerty */
+.alert {
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: none;
+}
+.alert.err { background: var(--red-soft); color: var(--red); border: 1px solid #fecaca; }
+.alert.ok { background: var(--emerald-soft); color: var(--emerald); border: 1px solid var(--emerald-border); }
+.alert.warn { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber-border); }
+
+/* Karty */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: #f1f5f9;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.badge.ok { background: var(--emerald-soft); color: var(--emerald); }
+.badge.warn { background: var(--amber-soft); color: var(--amber); }
+.badge.info { background: var(--accent-soft); color: var(--accent-dark); }
+
+/* Strefa wgrywania faktury */
+.upload-box {
+  width: 100%;
+  background: var(--surface-soft);
+  border: 1.5px dashed #7dd3fc;
+  border-radius: var(--radius-md);
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--accent-dark);
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.upload-box:active { background: var(--accent-soft); border-color: var(--accent); }
+
+/* Pasek ciągłości okresu */
+.continuity-bar {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-left: 3.5px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 11.5px;
+  color: var(--ink-sub);
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Siatka formularza i pola input */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.col-full { grid-column: span 2; }
+
+label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+input[type="text"], input[type="number"], input[type="date"], input[inputmode="decimal"] {
+  width: 100%;
+  min-width: 0;
+  height: 46px;
+  padding: 0 11px;
+  font-size: 16px;
+  font-weight: 800;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  transition: all 0.15s;
+}
+input[type="date"] {
+  padding: 0 7px;
+  font-size: 14px;
+  letter-spacing: -0.3px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  margin-left: 2px;
+  padding: 0;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+}
+input[readonly] { background: #f1f5f9; color: var(--muted); cursor: not-allowed; }
+.autofilled { background: #ecfdf5 !important; border-color: #34d399 !important; color: #065f46 !important; }
+.manual-edit { background: #fefce8 !important; border-color: #facc15 !important; }
+
+/* Sekcja kwoty brutto – pełna szerokość etykiety bez zbędnego przycisku */
+.gross-box {
+  background: var(--accent-soft);
+  border: 1.5px solid var(--accent-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-top: 4px;
+}
+.gross-box label {
+  color: var(--accent-dark);
+  margin-bottom: 6px;
+}
+.gross-box input {
+  background: #fff;
+  border-color: #7dd3fc;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--ink);
+}
+.kpi-mini {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.kpi-mini b {
+  display: block;
+  font-size: 14px;
+  color: var(--ink);
+  margin-top: 2px;
+}
+
+/* Przyciski */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius-md);
+  padding: 13px 16px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn:active { opacity: 0.9; transform: scale(0.99); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-navy { background: #1e293b; color: #fff; }
+.btn-emerald { background: var(--emerald); color: #fff; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
+.btn-outline { background: #fff; color: var(--ink-sub); border: 1.5px solid var(--border); }
+.btn-danger { background: var(--red-soft); color: var(--red); border: 1px solid #fecaca; }
+.btn-sm { padding: 6px 10px; font-size: 11.5px; border-radius: 8px; width: auto; height: 32px; }
+
+/* KROK 2: Jasny, czytelny Pasek Bilansu Na Żywo */
+.live-balance {
+  position: sticky;
+  top: 6px;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid var(--accent-border);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  box-shadow: 0 6px 16px -4px rgba(2, 132, 199, 0.12);
+}
+.lb-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  text-align: center;
+}
+.lb-item {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 4px;
+}
+.lb-label {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--muted);
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+.lb-val {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.lb-val.accent { color: var(--accent-dark); }
+.lb-val.warn { color: var(--amber); }
+.lb-val.ok { color: var(--emerald); }
+.lb-progress {
+  height: 5px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.lb-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--emerald));
+  width: 0%;
+  transition: width 0.25s ease;
+}
+
+/* Przełącznik trybu wprowadzania */
+.mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+.mode-switch button {
+  border: 0;
+  background: transparent;
+  padding: 8px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.mode-switch button.on {
+  background: #fff;
+  color: var(--accent-dark);
+  font-weight: 800;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+/* Karta Lokalu – pojedynczy, czysty nagłówek bez dublowania numeru */
+.unit-card {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #fff;
+  transition: border-color 0.15s, background 0.15s;
+}
+.unit-card.valid { border-color: #6ee7b7; background: #f8fffb; }
+.unit-card.warn { border-color: #fcd34d; background: #fffdf5; }
+
+.unit-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.unit-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.unit-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  display: inline-block;
+}
+.unit-card.valid .unit-dot { background: var(--emerald); }
+.unit-card.warn .unit-dot { background: var(--amber); }
+
+.unit-subbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.sub-pill {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.sub-pill.carry {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.unit-inputs { display: grid; grid-template-columns: 0.85fr 1.25fr; gap: 8px; align-items: end; }
+.unit-inputs > div { min-width: 0; }
+.unit-inputs.three { grid-template-columns: 1fr 1fr; gap: 10px; }
+.unit-inputs.three .date-col { grid-column: span 2; }
+
+.unit-meta {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--border);
+  font-size: 12px;
+  color: var(--ink-sub);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.est-banner {
+  margin-top: 8px;
+  padding: 7px 9px;
+  background: var(--amber-soft);
+  border: 1px solid var(--amber-border);
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: #92400e;
+  line-height: 1.35;
+}
+
+/* KROK 3: Raport */
+.summary-hero {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+  color: #fff;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 18px -4px rgba(5, 150, 105, 0.25);
+}
+.summary-hero .big { font-size: 28px; font-weight: 900; margin: 4px 0; letter-spacing: -0.5px; }
+.summary-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 12px;
+}
+.summary-pill {
+  background: rgba(255, 255, 255, 0.16);
+  padding: 7px 4px;
+  border-radius: 9px;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+.summary-pill b { display: block; font-size: 13px; margin-top: 2px; }
+
+.rep-unit {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 13px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+}
+.rep-unit-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+.rep-unit-total {
+  font-size: 16.5px;
+  font-weight: 900;
+  color: var(--emerald);
+  background: var(--emerald-soft);
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.rep-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.rep-line b { color: var(--ink); white-space: nowrap; }
+.rep-line.highlight {
+  background: var(--amber-soft);
+  color: #92400e;
+  padding: 5px 7px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.rep-line.uchyb {
+  background: var(--surface-soft);
+  padding: 5px 7px;
+  border-radius: 6px;
+  border-left: 3px solid var(--accent);
+}
+.rep-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* Statystyki */
+.stat-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.stat-table th, .stat-table td { padding: 8px 4px; text-align: right; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
+.stat-table th:first-child, .stat-table td:first-child { text-align: left; font-weight: 800; color: var(--ink); }
+.stat-table th { font-size: 10px; color: var(--muted); text-transform: uppercase; background: var(--surface-soft); }
+.bar-row { margin-bottom: 9px; }
+.bar-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; font-weight: 600; }
+.bar-track { height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--accent); border-radius: 99px; }
+
+/* Układ responsywny na Tablet i większe ekrany */
+@media (min-width: 700px) {
+  .container { max-width: 820px; padding: 16px 20px; }
+  #units-container, #rep-units-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  #units-container .unit-card, #rep-units-list .rep-unit {
+    margin-bottom: 0;
+  }
+}
+
+/* Czysty podgląd faktury PDF z drobną informacją pod spodem */
+.pdf-clean-box {
+  background: var(--surface-soft);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  margin-bottom: 12px;
+}
+.pdf-clean-pages img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #fff;
+  margin-bottom: 6px;
+}
+.pdf-clean-note {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 4px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+  <!-- Jasny, czytelny nagłówek bez ucinanego tekstu -->
+  <header class="app-bar">
+    <div class="brand">
+      <div class="brand-icon">💧</div>
+      <div class="brand-text">
+        <h1 class="brand-title">Woda 7</h1>
+        <span class="brand-sub">Rozliczenie Wspólnoty • Słowackiego 7</span>
+      </div>
+    </div>
+    <button type="button" id="btn-new" class="btn-new-inv" title="Rozpocznij rozliczanie nowej faktury">＋ Nowa</button>
+  </header>
+
+  <!-- Nawigacja z łagodnym podświetleniem aktywnej karty -->
+  <nav class="nav">
+    <button type="button" class="nav-btn active" data-tab="1"><span class="ico">📄</span>Faktura</button>
+    <button type="button" class="nav-btn" data-tab="2"><span class="ico">💧</span>Lokale</button>
+    <button type="button" class="nav-btn" data-tab="3"><span class="ico">📊</span>Raport</button>
+    <button type="button" class="nav-btn" data-tab="4"><span class="ico">📈</span>Statystyki</button>
+    <button type="button" class="nav-btn" data-tab="5"><span class="ico">🗂</span>Baza <span class="nav-badge" id="nav-cnt">0</span></button>
+  </nav>
+
+  <div id="msg-box" class="alert"></div>
+
+  <!-- KROK 1: FAKTURA GŁÓWNA -->
+  <section id="tab-1">
+    <div class="card">
+      <div class="card-head">
+        <h2 class="card-title">1. Faktura zbiorcza</h2>
+        <span id="period-badge" class="badge info">Okres: – dni</span>
+      </div>
+
+      <input type="file" id="file-inv" accept=".pdf,.xml,application/pdf,text/xml,application/xml" hidden>
+      <button type="button" id="btn-import-inv" class="upload-box">
+        <span>📥</span>
+        <span>Wgraj fakturę (PDF lub KSeF XML)</span>
+      </button>
+      <div id="inv-file-info" class="alert ok" style="margin-bottom:10px"></div>
+
+      <!-- Czysty podgląd faktury PDF + drobna informacja pod spodem (bez przycisków zwijania) -->
+      <div id="pdf-preview-wrap" class="pdf-clean-box" hidden>
+        <div id="pdf-clean-pages" class="pdf-clean-pages"></div>
+        <div id="pdf-clean-caption" class="pdf-clean-note"></div>
+      </div>
+
+      <div id="continuity-info" class="continuity-bar" hidden></div>
+
+      <div class="grid-2">
+        <div class="col-full">
+          <label for="f-num">Numer faktury</label>
+          <input type="text" id="f-num" placeholder="np. R/2026/063888">
+        </div>
+        <div>
+          <label for="f-from">Data od (ciągłość)</label>
+          <input type="date" id="f-from">
+        </div>
+        <div>
+          <label for="f-to">Data do (odczyt faktury)</label>
+          <input type="date" id="f-to">
+        </div>
+        <div>
+          <label for="f-main">Licznik główny (m³)</label>
+          <input type="text" id="f-main" inputmode="decimal" placeholder="0.00">
+          <span id="main-rate-sub" style="display:block;font-size:11px;color:var(--muted);margin-top:4px;font-weight:600">Stawka: 0,00 zł/m³</span>
+        </div>
+        <div>
+          <label for="f-sub">Abonament suma (zł)</label>
+          <input type="text" id="f-sub" inputmode="decimal" placeholder="0.00">
+          <span id="sub-per-unit" style="display:block;font-size:11px;color:var(--muted);margin-top:4px;font-weight:600">Na lokal (1/6): 0,00 zł</span>
+        </div>
+        <div class="col-full">
+          <label for="f-watsew">Woda i ścieki razem brutto (zł)</label>
+          <input type="text" id="f-watsew" inputmode="decimal" placeholder="0.00">
+          <span id="watsew-sub-info" style="display:block;font-size:11px;color:var(--muted);margin-top:4px;font-weight:600">Woda + Ścieki: 0,00 zł</span>
+          <input type="hidden" id="f-wat" value="">
+          <input type="hidden" id="f-sew" value="">
+        </div>
+      </div>
+
+      <!-- Czyste pole kwoty brutto (automatycznie podliczane w tle z Woda + Ścieki + Abonament) -->
+      <div class="gross-box">
+        <label for="f-gross">Razem do zapłaty brutto (zł)</label>
+        <input type="text" id="f-gross" inputmode="decimal" placeholder="0.00">
+      </div>
+
+      <div class="kpi-mini" style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <div>
+          <span style="font-size:11px;color:var(--muted);font-weight:700">STAWKA WODA + ŚCIEKI:</span>
+          <b id="rate-preview" style="font-size:15px;color:var(--accent-dark)">0,00 zł/m³</b>
+          <span id="rate-split-preview" style="display:block;font-size:11px;color:var(--muted);margin-top:1px">Woda: 0,00 zł/m³ + Ścieki: 0,00 zł/m³</span>
+        </div>
+        <div style="text-align:right">
+          <span style="font-size:11px;color:var(--muted);font-weight:700">ABONAMENT (1/6):</span>
+          <b id="sub-preview" style="font-size:15px;color:var(--ink)">0,00 zł / lokal</b>
+          <span id="sub-total-preview" style="display:block;font-size:11px;color:var(--muted);margin-top:1px">Łącznie: 0,00 zł</span>
+        </div>
+      </div>
+
+      <div id="inv-warnings" class="alert warn" style="margin-top:10px;margin-bottom:0"></div>
+
+      <button type="button" id="btn-to-step2" class="btn btn-primary" style="margin-top:14px">
+        Dalej: Odczyty 6 lokali ➔
+      </button>
+    </div>
+  </section>
+
+  <!-- KROK 2: ODCZYTY LOKALI -->
+  <section id="tab-2" hidden>
+    <div class="live-balance">
+      <div class="lb-grid">
+        <div class="lb-item">
+          <span class="lb-label">Licznik główny</span>
+          <span class="lb-val accent" id="lb-main">0,00 m³</span>
+        </div>
+        <div class="lb-item">
+          <span class="lb-label">Suma 6 lokali</span>
+          <span class="lb-val" id="lb-units">0,00 m³</span>
+        </div>
+        <div class="lb-item">
+          <span class="lb-label">Uchyb (Różnica)</span>
+          <span class="lb-val ok" id="lb-uchyb">0,00 m³</span>
+        </div>
+      </div>
+      <div class="lb-progress"><div class="lb-progress-fill" id="lb-bar"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">2. Zużycie w lokalach</h2>
+          <span style="font-size:11.5px;color:var(--muted)" id="step2-period-info">Data z faktury przypisana automatycznie</span>
+        </div>
+        <button type="button" id="btn-unlock-prev" class="btn btn-outline btn-sm" hidden>🔓 Tarcze</button>
+      </div>
+
+      <div class="mode-switch">
+        <button type="button" id="mode-use" class="on">💧 Zużycie (m³)</button>
+        <button type="button" id="mode-meter">🔢 Stan licznika</button>
+      </div>
+
+      <div id="units-container"></div>
+
+      <button type="button" id="btn-calc" class="btn btn-emerald" style="margin-top:8px">
+        ✅ Oblicz rozliczenie
+      </button>
+    </div>
+  </section>
+
+  <!-- KROK 3: RAPORT (MODEL 1) -->
+  <section id="tab-3" hidden>
+    <div id="rep-empty" class="card" style="text-align:center;padding:32px 16px">
+      <div style="font-size:36px;margin-bottom:8px">📊</div>
+      <h3 style="margin:0 0 6px;color:var(--ink)">Brak aktywnego rozliczenia</h3>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 16px">Wprowadź dane faktury i zużycie lokali lub otwórz zapisany raport z Bazy.</p>
+      <button type="button" class="btn btn-primary" onclick="switchTab(1)">Przejdź do formularza</button>
+    </div>
+
+    <div id="rep-content" hidden>
+      <div class="summary-hero">
+        <div style="font-size:12px;opacity:0.95;font-weight:600" id="r-header-meta">Faktura –</div>
+        <div class="big" id="r-total-gross">0,00 zł</div>
+        <div style="font-size:11.5px;opacity:0.95">Suma wpłat 6 lokali = 100% kwoty faktury</div>
+        <div class="summary-pills">
+          <div class="summary-pill">Licznik główny<b id="r-pill-main">0,00 m³</b></div>
+          <div class="summary-pill">Suma lokali<b id="r-pill-units">0,00 m³</b></div>
+          <div class="summary-pill">Uchyb<b id="r-pill-uchyb">0,00 m³</b></div>
+        </div>
+      </div>
+
+      <div id="rep-controls" class="card" style="padding:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button type="button" id="btn-share-all" class="btn btn-emerald" style="padding:11px">📤 Wyślij zbiorczo</button>
+          <button type="button" id="btn-copy-all" class="btn btn-outline" style="padding:11px">📋 Kopiuj tekst</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+          <button type="button" id="btn-copy-tsv" class="btn btn-outline" style="padding:10px;font-size:12.5px">📊 Kopiuj TSV (Excel)</button>
+          <button type="button" id="btn-save-pdf-rep" class="btn btn-outline" style="padding:10px;font-size:12.5px">📄 Zapisz jako PDF</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:8px">
+          <button type="button" id="btn-save-db" class="btn btn-primary">💾 Zapisz w Bazie</button>
+          <button type="button" id="btn-edit-current" class="btn btn-outline" style="width:auto;padding:0 14px" title="Wróć do edycji tej faktury">✏️ Edytuj</button>
+        </div>
+      </div>
+
+      <div id="rep-units-list"></div>
+    </div>
+  </section>
+
+  <!-- KROK 4: STATYSTYKI I WIRTUALNE LICZNIKI -->
+  <section id="tab-4" hidden>
+    <div class="card">
+      <div class="card-head">
+        <h2 class="card-title">📈 Statystyki i Liczniki</h2>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button type="button" id="btn-stat-tsv" class="btn btn-outline btn-sm">📊 Excel TSV</button>
+          <button type="button" id="btn-save-pdf-stat" class="btn btn-outline btn-sm">📄 Zapisz PDF</button>
+          <span class="badge info" id="stat-invoices-cnt">0 faktur</span>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 12px">
+        Porównanie wirtualnego licznika (rozliczonego na dzień faktury) z fizycznym stanem podlicznika oraz przesunięciem (Bilans = Fiz. − Wirt.).
+      </p>
+      <div id="stat-content"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2 class="card-title">⚖️ Historia uchybu</h2>
+      </div>
+      <div id="stat-uchyb-list"></div>
+    </div>
+  </section>
+
+  <!-- KROK 5: BAZA DANYCH I BACKUP -->
+  <section id="tab-5" hidden>
+    <div class="card">
+      <div class="card-head">
+        <h2 class="card-title">💾 Kopia bazy na telefonie</h2>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 12px">
+        Zapisz bazę <code>.json</code> we wskazanym folderze telefonu lub wczytaj ją z pliku. Każde zapisane rozliczenie zachowuje pełną ciągłość stanów i dat.
+      </p>
+      <div class="grid-2" style="margin-bottom:0">
+        <button type="button" id="btn-export-file" class="btn btn-emerald">💾 Eksportuj bazę</button>
+        <button type="button" id="btn-import-file" class="btn btn-outline">📂 Importuj z pliku</button>
+      </div>
+      <input type="file" id="file-db-import" accept=".json,application/json,text/plain" hidden>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2 class="card-title">🗂 Zapisane rozliczenia</h2>
+        <button type="button" id="btn-clear-db" class="btn btn-danger btn-sm">🗑 Wyczyść</button>
+      </div>
+      <div id="history-list"></div>
+    </div>
+  </section>
+</div>
+
+
+<script>
+const UNITS = ['7/1', '7/2', '7A/1', '7A/2', '7B/1', '7B/2'];
+const DB_KEY = 'wsp7_v21_clean_start';
+const DRAFT_KEY = 'wsp7_v21_clean_draft';
+
+let state = {
+  inputMode: 'use',
+  unlockPrev: false,
+  lastSyncedInvTo: '',
+  invoiceIssueDate: '',
+  grossManual: false,
+  manualPrevMeters: {},
+  history: [],
+  currentReport: null
+};
+
+const $ = id => document.getElementById(id);
+
+
+function sanitizeDecimalInput(el) {
+  if (!el) return;
+  let v = el.value.replace(/[^0-9.,]/g, '');
+  // Zamiana pierwszego separatora na kropkę/przecinek i usunięcie wszystkich kolejnych kropek/przecinków
+  const firstSep = v.search(/[.,]/);
+  if (firstSep !== -1) {
+    const sepChar = v[firstSep];
+    const intPart = v.slice(0, firstSep);
+    const decPart = v.slice(firstSep + 1).replace(/[.,]/g, '').slice(0, 2);
+    v = intPart + sepChar + decPart;
+  }
+  if (v !== el.value) el.value = v;
+}
+
+const toInt = val => {
+  const n = parseFloat(String(val ?? '').replace(/\s+/g, '').replace(',', '.'));
+  return isNaN(n) ? 0 : Math.round(n * 100);
+};
+const fmt2 = intVal => (intVal / 100).toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const zl = intVal => fmt2(intVal) + ' zł';
+const m3 = intVal => fmt2(intVal) + ' m³';
+const fmtDate = iso => iso ? iso.split('-').reverse().join('.') : '–';
+
+function daysBetween(d1, d2) {
+  if (!d1 || !d2) return 0;
+  const [y1, m1, day1] = d1.split('-').map(Number);
+  const [y2, m2, day2] = d2.split('-').map(Number);
+  return Math.round((Date.UTC(y2, m2 - 1, day2) - Date.UTC(y1, m1 - 1, day1)) / 86400000);
+}
+
+function sortChronologically(list) {
+  return [...list].sort((a, b) => {
+    if (a.to !== b.to) return a.to < b.to ? -1 : 1;
+    if (a.from !== b.from) return a.from < b.from ? -1 : 1;
+    return (a.id || 0) - (b.id || 0);
+  });
+}
+
+// Metoda największych reszt (Hamiltona)
+function allocateExact(totalInt, weights) {
+  const n = weights.length;
+  const sign = totalInt >= 0 ? 1 : -1;
+  const absTotal = Math.abs(totalInt);
+  const sumW = weights.reduce((a, b) => a + Math.max(0, b), 0);
+  if (sumW <= 0) {
+    const base = Math.floor(absTotal / n);
+    const rem = absTotal - base * n;
+    return weights.map((_, i) => (base + (i < rem ? 1 : 0)) * sign);
+  }
+  const exact = weights.map(w => (absTotal * Math.max(0, w)) / sumW);
+  const floors = exact.map(x => Math.floor(x));
+  let diff = absTotal - floors.reduce((a, b) => a + b, 0);
+  const order = exact.map((x, i) => ({ i, rem: x - floors[i], w: weights[i] }))
+    .sort((a, b) => b.rem - a.rem || b.w - a.w);
+  for (let k = 0; k < diff; k++) {
+    floors[order[k % n].i]++;
+  }
+  return floors.map(x => x * sign);
+}
+
+function showMsg(text, type = 'ok') {
+  const box = $('msg-box');
+  if (!text) { box.style.display = 'none'; return; }
+  box.className = 'alert ' + type;
+  box.textContent = text;
+  box.style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function loadDatabase() {
+  try {
+    const raw = localStorage.getItem(DB_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed.history)) state.history = sortChronologically(parsed.history);
+    }
+  } catch (e) {}
+  updateNavCount();
+}
+
+function recalculateHistoryChain() {
+  state.history = sortChronologically(state.history);
+  const virt = { '7/1': 0, '7/2': 0, '7A/1': 0, '7A/2': 0, '7B/1': 0, '7B/2': 0 };
+  const rawM = { '7/1': 0, '7/2': 0, '7A/1': 0, '7A/2': 0, '7B/1': 0, '7B/2': 0 };
+  const carry = { '7/1': 0, '7/2': 0, '7A/1': 0, '7A/2': 0, '7B/1': 0, '7B/2': 0 };
+
+  state.history.forEach((h, hIdx) => {
+    if (hIdx > 0 && state.history[hIdx - 1].to) {
+      h.from = state.history[hIdx - 1].to;
+    }
+    const invDays = Math.max(1, daysBetween(h.from, h.to));
+    h.days = invDays;
+    (h.units || []).forEach(u => {
+      const name = u.u;
+      if (hIdx === 0 && u.basePrev && rawM[name] === 0 && virt[name] === 0) {
+        rawM[name] = u.basePrev;
+        virt[name] = u.basePrev;
+      }
+      const prevV = virt[name] || 0;
+      const prevC = carry[name] || 0;
+      const rawUse = u.rawUse ?? u.normUse ?? 0;
+      const diffDays = (h.to && u.readDate) ? daysBetween(h.to, u.readDate) : (u.diffDays || 0);
+      const totalPool = rawUse + prevC;
+      let normUse = 0;
+      let nextC = 0;
+      if (totalPool <= 0) {
+        normUse = 0;
+        nextC = totalPool;
+      } else {
+        const actualDays = Math.max(1, invDays + diffDays);
+        normUse = diffDays !== 0 ? Math.max(0, Math.round(totalPool * (invDays / actualDays))) : totalPool;
+        nextC = totalPool - normUse;
+      }
+      u.prevInt = prevV;
+      u.rawPrevInt = rawM[name];
+      u.carryFromPrev = prevC;
+      u.normUse = normUse;
+      u.carryoverNext = nextC;
+      u.virtualCurr = prevV + normUse;
+      rawM[name] = (rawM[name] || 0) + rawUse;
+      u.rawMeterCurr = rawM[name];
+
+      virt[name] = u.virtualCurr;
+      carry[name] = nextC;
+    });
+
+    const weights = h.units.map(u => u.normUse);
+    const totalNormM3 = weights.reduce((a, b) => a + b, 0);
+    const totalRawM3 = h.units.reduce((a, u) => a + (u.rawUse || 0), 0);
+    const varCostTotal = h.gross - h.sub;
+    const subShares = allocateExact(h.sub, UNITS.map(() => 1));
+    const varShares = allocateExact(varCostTotal, weights);
+    const uchybTotalM3 = h.main - totalNormM3;
+    const uchybSharesM3 = allocateExact(uchybTotalM3, weights);
+
+    const totalOwnPool = h.main > 0 ? Math.round((varCostTotal * totalNormM3) / h.main) : varCostTotal;
+    const ownShares = allocateExact(totalOwnPool, weights);
+
+    h.totalRawM3 = totalRawM3;
+    h.totalNormM3 = totalNormM3;
+    h.uchybTotalM3 = uchybTotalM3;
+    h.rateCombined = h.main > 0 ? Math.round(varCostTotal / (h.main / 100)) : 0;
+
+    h.units.forEach((u, i) => {
+      u.subCost = subShares[i];
+      u.varCost = varShares[i];
+      u.ownCost = ownShares[i];
+      u.uchybCost = varShares[i] - ownShares[i];
+      u.uchybM3 = uchybSharesM3[i];
+      u.totalCost = subShares[i] + varShares[i];
+    });
+  });
+}
+
+function saveDatabase() {
+  recalculateHistoryChain();
+  try {
+    localStorage.setItem(DB_KEY, JSON.stringify({ app: 'wsp7', v: 10, history: state.history }));
+  } catch (e) {
+    showMsg('Uwaga: pamięć przeglądarki jest pełna lub zablokowana. Eksportuj bazę do pliku!', 'warn');
+  }
+  updateNavCount();
+}
+
+function updateNavCount() {
+  $('nav-cnt').textContent = state.history.length;
+}
+
+function getPreviousRecordForCurrentForm() {
+  if (!state.history.length) return null;
+  const curNum = $('f-num')?.value.trim() || '';
+  const curFrom = $('f-from')?.value || '';
+  const curTo = $('f-to')?.value || '';
+  const sorted = sortChronologically(state.history);
+
+  const existingIdx = sorted.findIndex(h => h.num === curNum);
+  if (existingIdx > 0) return sorted[existingIdx - 1];
+  if (existingIdx === 0) return null;
+
+  if (curFrom) {
+    const earlier = sorted.filter(h => h.to <= curFrom);
+    if (earlier.length) return earlier[earlier.length - 1];
+  }
+  if (curTo) {
+    const earlier = sorted.filter(h => h.to < curTo);
+    if (earlier.length) return earlier[earlier.length - 1];
+  }
+  return sorted[sorted.length - 1];
+}
+
+function enforceDateContinuity() {
+  const prevRec = getPreviousRecordForCurrentForm();
+  const contBar = $('continuity-info');
+  const fromEl = $('f-from');
+  const issueNote = state.invoiceIssueDate ? ` • Wystawiono: ${fmtDate(state.invoiceIssueDate)}` : '';
+  if (prevRec && prevRec.to) {
+    fromEl.value = prevRec.to;
+    fromEl.readOnly = true;
+    contBar.hidden = false;
+    contBar.innerHTML = `<span>🔗 <b>Ciągłość</b> po ${prevRec.num}${issueNote}</span><b>Od: ${fmtDate(prevRec.to)}</b>`;
+  } else {
+    fromEl.readOnly = false;
+    if (state.invoiceIssueDate) {
+      contBar.hidden = false;
+      contBar.innerHTML = `<span>📄 <b>Data wystawienia faktury:</b> ${fmtDate(state.invoiceIssueDate)}</span><b>Odczyt do: ${fmtDate($('f-to').value)}</b>`;
+    } else {
+      contBar.hidden = true;
+    }
+  }
+}
+
+function syncUnitDatesWithInvoice(newInvTo, forceAll = false) {
+  if (!newInvTo) return;
+  const oldInvTo = state.lastSyncedInvTo;
+  UNITS.forEach(u => {
+    const k = u.replace('/', '-');
+    const dtEl = $('udate-' + k);
+    if (!dtEl) return;
+    if (forceAll || !dtEl.value || dtEl.value === oldInvTo) {
+      dtEl.value = newInvTo;
+    }
+  });
+  state.lastSyncedInvTo = newInvTo;
+}
+
+function getPrevStateForUnit(u) {
+  const prevRec = getPreviousRecordForCurrentForm();
+  const curNum = $('f-num')?.value.trim() || '';
+  const curTo = $('f-to')?.value || '9999-12-31';
+
+  let totM3 = 0, totDays = 0;
+  state.history.forEach(h => {
+    if (h.num === curNum || h.to > curTo) return;
+    const hu = h.units && h.units.find(x => x.u === u);
+    if (hu && h.days > 0) { totM3 += hu.normUse; totDays += h.days; }
+  });
+  const avgDaily = totDays > 0 ? (totM3 / totDays) : 0;
+
+  if (!prevRec || !prevRec.units) return { virtualPrev: 0, carryoverM3: 0, rawPrev: 0, avgDaily };
+  const found = prevRec.units.find(x => x.u === u);
+  if (!found) return { virtualPrev: 0, carryoverM3: 0, rawPrev: 0, avgDaily };
+
+  return {
+    virtualPrev: found.virtualCurr ?? 0,
+    carryoverM3: found.carryoverNext ?? 0,
+    rawPrev: found.rawMeterCurr ?? found.virtualCurr ?? 0,
+    avgDaily
+  };
+}
+
+// Stałe, czyste nagłówki lokali (bez dublowania numeru i bez ryzyka zepsucia klucza edycją)
+function getEffectivePrevMeter(u) {
+  const prevInfo = getPrevStateForUnit(u);
+  if (state.manualPrevMeters && state.manualPrevMeters[u] !== undefined) {
+    return state.manualPrevMeters[u];
+  }
+  return prevInfo.rawPrev;
+}
+
+function renderUnitsForm(preserveValues = {}) {
+  const container = $('units-container');
+  const isMeter = state.inputMode === 'meter';
+  const invFrom = $('f-from').value;
+  const invTo = $('f-to').value;
+  const invDays = (invFrom && invTo && invFrom <= invTo) ? Math.max(1, daysBetween(invFrom, invTo)) : 0;
+
+  $('btn-unlock-prev').hidden = !isMeter;
+  $('btn-unlock-prev').textContent = state.unlockPrev ? '🔒 Zablokuj' : '🔓 Tarcze';
+  $('step2-period-info').textContent = invTo
+    ? `Data odczytu z faktury: ${fmtDate(invTo)}${invDays ? ' (' + invDays + ' dni)' : ''}`
+    : 'Wprowadź datę faktury w Kroku 1';
+
+  container.innerHTML = UNITS.map(u => {
+    const k = u.replace('/', '-');
+    const prevInfo = getPrevStateForUnit(u);
+    const effPrev = getEffectivePrevMeter(u);
+    const startMeter = preserveValues[k]?.prev !== undefined && preserveValues[k]?.prev !== ''
+      ? toInt(preserveValues[k].prev)
+      : effPrev;
+    const unitDate = preserveValues[k]?.date || invTo || '';
+    const hasHistory = prevInfo.avgDaily > 0;
+
+    return `
+      <div class="unit-card" id="ucard-${k}">
+        <div class="unit-top">
+          <div class="unit-name">
+            <span class="unit-dot"></span>
+            <span>Lokal ${u}</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            ${hasHistory ? `<button type="button" class="btn btn-outline btn-sm" data-avg="${u}" title="Wstaw średnie zużycie z historii">⚡ Średnia</button>` : ''}
+            <span class="badge" id="ubadge-${k}">Czeka</span>
+          </div>
+        </div>
+
+        <div class="unit-subbar">
+          <span class="sub-pill">Wirt. licznik: <b>${m3(prevInfo.virtualPrev)}</b></span>
+          <span class="sub-pill">Fiz. tarcza: <b>${m3(effPrev)}</b></span>
+          ${prevInfo.carryoverM3 !== 0 ? `<span class="sub-pill carry">Bilans poprz.: ${prevInfo.carryoverM3 > 0 ? '+' : ''}${m3(prevInfo.carryoverM3)}</span>` : ''}
+        </div>
+
+        <div class="unit-inputs ${isMeter ? 'three' : ''}">
+          ${isMeter ? `
+            <div>
+              <label for="uprev-${k}">Poprzedni stan (m³)</label>
+              <input type="text" id="uprev-${k}" inputmode="decimal" value="${(startMeter / 100).toFixed(2)}" ${state.unlockPrev ? '' : 'readonly'}>
+            </div>
+          ` : ''}
+          <div>
+            <label for="uval-${k}">${isMeter ? 'Obecny stan (m³)' : 'Zużycie (m³)'}</label>
+            <input type="text" id="uval-${k}" inputmode="decimal" placeholder="0.00" value="${preserveValues[k]?.val ?? ''}">
+          </div>
+          <div class="date-col">
+            <label for="udate-${k}">Data odczytu</label>
+            <input type="date" id="udate-${k}" value="${unitDate}">
+          </div>
+        </div>
+
+        <div class="est-banner" id="uest-${k}" hidden></div>
+        <div class="unit-meta" id="umeta-${k}">
+          <span>Na dzień odczytu (${invTo ? fmtDate(invTo) : '–'}):</span>
+          <b id="unorm-${k}" style="color:var(--ink);font-size:13px">0,00 m³</b>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (invTo) state.lastSyncedInvTo = invTo;
+
+  UNITS.forEach(u => {
+    const k = u.replace('/', '-');
+    ['uval-', 'udate-', 'uprev-'].forEach(prefix => {
+      const el = $(prefix + k);
+      if (el) el.addEventListener('input', () => {
+        if (prefix !== 'udate-') sanitizeDecimalInput(el);
+        el.classList.toggle('manual-edit', el.value.trim() !== '');
+        if (prefix === 'uprev-') {
+          state.manualPrevMeters[u] = toInt(el.value);
+        }
+        updateUnitLive(u);
+        updateLiveBalanceBar();
+        saveDraft();
+      });
+    });
+    updateUnitLive(u);
+  });
+
+  container.querySelectorAll('[data-avg]').forEach(btn => {
+    btn.addEventListener('click', () => fillHistoricalAverage(btn.dataset.avg));
+  });
+
+  container.querySelectorAll('input[type="date"]').forEach(dtEl => {
+    dtEl.addEventListener('click', () => {
+      if (typeof dtEl.showPicker === 'function') {
+        try { dtEl.showPicker(); } catch (e) {}
+      }
+    });
+  });
+
+  updateLiveBalanceBar();
+}
+
+function updateLiveBalanceBar() {
+  const mainM3 = toInt($('f-main').value);
+  let sumNorm = 0;
+  UNITS.forEach(u => {
+    const d = computeUnitData(u);
+    if (!d.empty && !d.invalid) sumNorm += d.normUseInt;
+  });
+  const uch = mainM3 - sumNorm;
+  $('lb-main').textContent = m3(mainM3);
+  $('lb-units').textContent = m3(sumNorm);
+  const uchEl = $('lb-uchyb');
+  uchEl.textContent = (uch > 0 ? '+' : '') + m3(uch);
+  uchEl.className = 'lb-val ' + ((mainM3 > 0 && Math.abs(uch) > mainM3 * 0.1) ? 'warn' : 'ok');
+
+  const pct = mainM3 > 0 ? Math.min(100, Math.round((sumNorm / mainM3) * 100)) : 0;
+  $('lb-bar').style.width = pct + '%';
+}
+
+function fillHistoricalAverage(u) {
+  const k = u.replace('/', '-');
+  const invDays = Math.max(1, daysBetween($('f-from').value, $('f-to').value) || 45);
+  const prevInfo = getPrevStateForUnit(u);
+  if (prevInfo.avgDaily <= 0) {
+    showMsg(`Brak wcześniejszych faktur dla lokalu ${u} – wpisz wartość ręcznie.`, 'warn');
+    return;
+  }
+  const estUseInt = Math.max(0, Math.round(prevInfo.avgDaily * invDays) - prevInfo.carryoverM3);
+  const baseRaw = state.inputMode === 'meter' && $('uprev-' + k) ? toInt($('uprev-' + k).value) : prevInfo.rawPrev;
+  if (state.inputMode === 'meter') {
+    $('uval-' + k).value = ((baseRaw + estUseInt) / 100).toFixed(2);
+  } else {
+    $('uval-' + k).value = (estUseInt / 100).toFixed(2);
+  }
+  if ($('f-to').value) $('udate-' + k).value = $('f-to').value;
+  updateUnitLive(u);
+  updateLiveBalanceBar();
+  saveDraft();
+}
+
+function computeUnitData(u) {
+  const k = u.replace('/', '-');
+  const prevInfo = getPrevStateForUnit(u);
+  const invFrom = $('f-from').value;
+  const invTo = $('f-to').value;
+  const invDays = Math.max(1, daysBetween(invFrom, invTo));
+
+  const rawInputStr = $('uval-' + k) ? $('uval-' + k).value : '';
+  const readDate = ($('udate-' + k) && $('udate-' + k).value) ? $('udate-' + k).value : invTo;
+
+  const rawPrevUsed = (state.inputMode === 'meter' && $('uprev-' + k))
+    ? toInt($('uprev-' + k).value)
+    : getEffectivePrevMeter(u);
+
+  if (rawInputStr === '') {
+    return { u, empty: true, prevInt: prevInfo.virtualPrev, rawPrevUsed };
+  }
+
+  const inputInt = toInt(rawInputStr);
+  const rawUseFromInput = state.inputMode === 'meter' ? (inputInt - rawPrevUsed) : inputInt;
+  const rawMeterCurr = state.inputMode === 'meter' ? inputInt : (rawPrevUsed + rawUseFromInput);
+
+  if (rawUseFromInput < 0) {
+    return { u, invalid: true, reason: 'Stan mniejszy niż poprzedni odczyt tarczy', prevInt: prevInfo.virtualPrev, rawPrevUsed };
+  }
+
+  const diffDays = (invTo && readDate) ? daysBetween(invTo, readDate) : 0;
+
+  if (invFrom && invTo && readDate) {
+    const minAllowedDiff = -Math.min(20, Math.floor(invDays * 0.6));
+    if (diffDays < minAllowedDiff || diffDays > 45) {
+      return {
+        u,
+        invalid: true,
+        reason: `Data odczytu (${diffDays > 0 ? '+' : ''}${diffDays} dni względem końca faktury) wykracza poza zakres okresu. Sprawdź miesiąc!`,
+        prevInt: prevInfo.virtualPrev,
+        rawPrevUsed
+      };
+    }
+  }
+
+  const carryFromPrev = prevInfo.carryoverM3 || 0;
+  const totalPool = rawUseFromInput + carryFromPrev;
+  const actualReadDays = Math.max(1, invDays + diffDays);
+
+  let normUseInt = 0;
+  let carryoverNext = 0;
+
+  if (totalPool <= 0) {
+    normUseInt = 0;
+    carryoverNext = totalPool;
+  } else {
+    normUseInt = diffDays !== 0
+      ? Math.max(0, Math.round(totalPool * (invDays / actualReadDays)))
+      : totalPool;
+    carryoverNext = totalPool - normUseInt;
+  }
+
+  const baseVirt = (state.history.length === 0 && state.inputMode === 'meter') ? rawPrevUsed : prevInfo.virtualPrev;
+  const virtualCurr = baseVirt + normUseInt;
+
+  const curDailyM3 = normUseInt / invDays;
+  const isAnomaly = prevInfo.avgDaily > 0 && Math.abs(normUseInt - prevInfo.avgDaily * invDays) >= 350 &&
+    (curDailyM3 > prevInfo.avgDaily * 2.1 || curDailyM3 < prevInfo.avgDaily * 0.35);
+
+  return {
+    u,
+    empty: false,
+    invalid: false,
+    isAnomaly,
+    basePrev: (state.history.length === 0 && state.inputMode === 'meter') ? rawPrevUsed : 0,
+    prevInt: baseVirt,
+    rawPrevUsed,
+    rawUseInt: rawUseFromInput,
+    carryFromPrev,
+    effectiveUseSinceInvStart: Math.max(0, totalPool),
+    normUseInt,
+    carryoverNext,
+    virtualCurr,
+    rawMeterCurr,
+    readDate: readDate || invTo,
+    diffDays,
+    invDays,
+    actualReadDays,
+    dailyLiters: Math.round((normUseInt * 10) / invDays)
+  };
+}
+
+function updateUnitLive(u) {
+  const k = u.replace('/', '-');
+  const d = computeUnitData(u);
+  const card = $('ucard-' + k);
+  const badge = $('ubadge-' + k);
+  const est = $('uest-' + k);
+  const normEl = $('unorm-' + k);
+
+  if (!card) return;
+  est.hidden = true;
+
+  if (d.empty) {
+    card.className = 'unit-card';
+    badge.className = 'badge';
+    badge.textContent = 'Czeka';
+    normEl.textContent = '0,00 m³';
+    return;
+  }
+  if (d.invalid) {
+    card.className = 'unit-card warn';
+    badge.className = 'badge warn';
+    badge.textContent = 'Błąd';
+    normEl.textContent = '–';
+    est.hidden = false;
+    est.innerHTML = `⚠️ ${d.reason}`;
+    return;
+  }
+
+  const mainM3Val = toInt($('f-main')?.value);
+  const subVal = toInt($('f-sub')?.value);
+  const watSewVal = toInt($('f-watsew')?.value) || Math.max(0, toInt($('f-gross')?.value) - subVal);
+  if (mainM3Val > 0 && (watSewVal > 0 || subVal > 0)) {
+    const estCost = Math.round((watSewVal * d.normUseInt) / mainM3Val) + Math.round(subVal / 6);
+    normEl.textContent = `${m3(d.normUseInt)} • ~${zl(estCost)}`;
+  } else {
+    normEl.textContent = m3(d.normUseInt);
+  }
+
+  const msgs = [];
+  if (d.carryFromPrev !== 0) {
+    const cSign = d.carryFromPrev > 0 ? '+' : '';
+    msgs.push(`🔄 Uwzględniono bilans z poprz. faktury: <b>${cSign}${m3(d.carryFromPrev)}</b> (pula: ${m3(d.effectiveUseSinceInvStart)}).`);
+  }
+  if (d.diffDays !== 0) {
+    if (d.diffDays > 0) {
+      msgs.push(`⏱ <b>Odczyt +${d.diffDays} dni po fakturze</b> (${d.actualReadDays}d zamiast ${d.invDays}d): ze średniej przyjęto <b>${m3(d.normUseInt)}</b>, a nadwyżka <b>+${m3(d.carryoverNext)}</b> przechodzi na kolejny okres.`);
+    } else {
+      msgs.push(`⏪ <b>Odczyt ${Math.abs(d.diffDays)} dni przed fakturą</b> (${d.actualReadDays}d zamiast ${d.invDays}d): ze średniej dociągnięto do <b>${m3(d.normUseInt)}</b>, a kredyt <b>${m3(d.carryoverNext)}</b> pomniejszy kolejny okres.`);
+    }
+  } else if (d.carryoverNext < 0) {
+    msgs.push(`ℹ️ Pozostały kredyt <b>${m3(d.carryoverNext)}</b> przechodzi na kolejny okres.`);
+  }
+  if (d.isAnomaly) {
+    msgs.push(`🔎 <b>Uwaga:</b> Zużycie dobowe (${d.dailyLiters} l/d) mocno odbiega od średniej historycznej lokalu.`);
+  }
+  if (msgs.length) {
+    est.hidden = false;
+    est.innerHTML = msgs.join('<br>');
+  }
+
+  card.className = d.isAnomaly ? 'unit-card warn' : 'unit-card valid';
+  badge.className = d.isAnomaly ? 'badge warn' : 'badge ok';
+  badge.textContent = `OK • ${d.dailyLiters} l/d`;
+}
+
+function updateInvoicePreview() {
+  enforceDateContinuity();
+  const fr = $('f-from').value;
+  const to = $('f-to').value;
+  const days = (fr && to && fr <= to) ? Math.max(1, daysBetween(fr, to)) : 0;
+  $('period-badge').textContent = days ? `Okres: ${days} dni` : 'Okres: – dni';
+
+  const mainM3 = toInt($('f-main').value);
+  const sub = toInt($('f-sub').value);
+  const wat = toInt($('f-wat').value);
+  const sew = toInt($('f-sew').value);
+  const watSew = toInt($('f-watsew').value);
+  let gross = toInt($('f-gross').value);
+
+  // Mała czcionka pod polem "Woda i ścieki razem brutto (zł)"
+  if (wat > 0 || sew > 0) {
+    $('watsew-sub-info').textContent = `Woda: ${zl(wat)} + Ścieki: ${zl(sew)} = ${zl(wat + sew)}`;
+  } else {
+    $('watsew-sub-info').textContent = `Woda + Ścieki: ${zl(watSew)}`;
+  }
+
+  const varPool = watSew > 0 ? watSew : Math.max(0, gross - sub);
+  const tariffRate = mainM3 > 0 ? (varPool / (mainM3 / 100)) : 0;
+  const watRate = mainM3 > 0 ? (wat / (mainM3 / 100)) : 0;
+  const sewRate = mainM3 > 0 ? (sew / (mainM3 / 100)) : 0;
+  const rateStr = mainM3 > 0 ? zl(Math.round(tariffRate)) + '/m³' : '0,00 zł/m³';
+  const subUnitStr = zl(Math.round(sub / 6));
+  $('main-rate-sub').textContent = `Stawka: ${rateStr}`;
+  $('sub-per-unit').textContent = `Na lokal (1/6): ${subUnitStr}`;
+  $('rate-preview').textContent = rateStr;
+  $('rate-split-preview').textContent = mainM3 > 0 && (wat > 0 || sew > 0)
+    ? `Woda: ${zl(Math.round(watRate))}/m³ + Ścieki: ${zl(Math.round(sewRate))}/m³`
+    : `Koszt zmienny: ${zl(varPool)}`;
+  $('sub-preview').textContent = `${subUnitStr} / lokal`;
+  $('sub-total-preview').textContent = `Łącznie: ${zl(sub)}`;
+
+  const warns = [];
+  if (gross > 0 && sub > gross) {
+    warns.push(`Kwota abonamentu (${zl(sub)}) nie może być wyższa niż kwota Razem brutto (${zl(gross)})!`);
+  }
+  if (gross > 0 && (watSew + sub) > 0 && Math.abs(gross - (watSew + sub)) > 2) {
+    warns.push(`Suma składników (Woda i ścieki ${zl(watSew)} + Abonament ${zl(sub)} = ${zl(watSew + sub)}) różni się od kwoty Razem brutto (${zl(gross)}) o ${zl(Math.abs(gross - (watSew + sub)))}.`);
+  }
+  const warnBox = $('inv-warnings');
+  if (warns.length) {
+    warnBox.innerHTML = '⚠️ ' + warns.join('<br>⚠️ ');
+    warnBox.style.display = 'block';
+  } else {
+    warnBox.style.display = 'none';
+  }
+}
+
+function calculateSettlement() {
+  showMsg('');
+  enforceDateContinuity();
+  const num = $('f-num').value.trim();
+  const from = $('f-from').value;
+  const to = $('f-to').value;
+  const mainM3 = toInt($('f-main').value);
+  const subTotal = toInt($('f-sub').value);
+  const watTotal = toInt($('f-wat').value);
+  const sewTotal = toInt($('f-sew').value);
+  const watSewTotal = toInt($('f-watsew').value);
+  let grossTotal = toInt($('f-gross').value);
+
+  if (grossTotal <= 0 && (watSewTotal + subTotal) > 0) {
+    grossTotal = watSewTotal + subTotal;
+    $('f-gross').value = (grossTotal / 100).toFixed(2);
+  }
+
+  if (!num || !from || !to || mainM3 <= 0 || grossTotal <= 0) {
+    switchTab(1);
+    showMsg('Uzupełnij w Kroku 1: numer faktury, daty okresu, zużycie główne m³ oraz kwotę Razem brutto.', 'err');
+    return;
+  }
+  if (from > to) {
+    switchTab(1);
+    showMsg('Data początkowa faktury nie może być późniejsza niż data końcowa.', 'err');
+    return;
+  }
+  if (subTotal > grossTotal) {
+    switchTab(1);
+    showMsg('Kwota abonamentu nie może przekraczać całkowitej kwoty brutto faktury.', 'err');
+    return;
+  }
+
+  const unitData = UNITS.map(u => computeUnitData(u));
+  const invalidUnits = unitData.filter(d => d.empty || d.invalid);
+  if (invalidUnits.length) {
+    const details = invalidUnits.map(d => d.invalid ? `${d.u} (${d.reason})` : `${d.u} (brak wartości)`).join('; ');
+    showMsg(`Uzupełnij lub popraw dane lokali: ${details}.`, 'err');
+    return;
+  }
+
+  const totalNormM3 = unitData.reduce((acc, d) => acc + d.normUseInt, 0);
+  const totalRawM3 = unitData.reduce((acc, d) => acc + d.rawUseInt, 0);
+  if (totalNormM3 <= 0) {
+    showMsg('Łączne znormalizowane zużycie wszystkich lokali wynosi 0,00 m³.', 'err');
+    return;
+  }
+
+  const invDays = Math.max(1, daysBetween(from, to));
+  const varCostTotal = grossTotal - subTotal;
+
+  const subShares = allocateExact(subTotal, UNITS.map(() => 1));
+  const weights = unitData.map(d => d.normUseInt);
+  const varTotalShares = allocateExact(varCostTotal, weights);
+  const uchybTotalM3 = mainM3 - totalNormM3;
+  const uchybSharesM3 = allocateExact(uchybTotalM3, weights);
+
+  const totalOwnCostPool = mainM3 > 0 ? Math.round((varCostTotal * totalNormM3) / mainM3) : varCostTotal;
+  const ownCostShares = allocateExact(totalOwnCostPool, weights);
+
+  const unitsFinal = unitData.map((d, i) => {
+    const varTot = varTotalShares[i];
+    const ownCostExact = ownCostShares[i];
+    const uchybCost = varTot - ownCostExact;
+    const totalToPay = subShares[i] + varTot;
+
+    return {
+      u: d.u,
+      basePrev: d.basePrev || 0,
+      prevInt: d.prevInt,
+      rawPrevInt: d.rawPrevUsed,
+      carryFromPrev: d.carryFromPrev,
+      rawUse: d.rawUseInt,
+      normUse: d.normUseInt,
+      carryoverNext: d.carryoverNext,
+      virtualCurr: d.virtualCurr,
+      rawMeterCurr: d.rawMeterCurr,
+      readDate: d.readDate,
+      diffDays: d.diffDays,
+      uchybM3: uchybSharesM3[i],
+      ownCost: ownCostExact,
+      uchybCost: uchybCost,
+      subCost: subShares[i],
+      varCost: varTot,
+      totalCost: totalToPay
+    };
+  });
+
+  const tariffWaterRate = mainM3 > 0 ? (watTotal / (mainM3 / 100)) : 0;
+  const tariffSewageRate = mainM3 > 0 ? (sewTotal / (mainM3 / 100)) : 0;
+  const tariffCombinedRate = mainM3 > 0 ? (varCostTotal / (mainM3 / 100)) : 0;
+
+  state.currentReport = {
+    id: Date.now(),
+    num,
+    from,
+    to,
+    days: invDays,
+    main: mainM3,
+    sub: subTotal,
+    wat: watTotal,
+    sew: sewTotal,
+    gross: grossTotal,
+    totalRawM3,
+    totalNormM3,
+    uchybTotalM3,
+    rateWater: Math.round(tariffWaterRate),
+    rateSewage: Math.round(tariffSewageRate),
+    rateCombined: Math.round(tariffCombinedRate),
+    inputMode: state.inputMode,
+    units: unitsFinal,
+    saved: false
+  };
+
+  renderReport();
+  switchTab(3);
+}
+
+function renderReport() {
+  const r = state.currentReport;
+  $('rep-empty').hidden = !!r;
+  $('rep-content').hidden = !r;
+  if (!r) return;
+
+  $('r-header-meta').textContent = `Faktura ${r.num} • ${fmtDate(r.from)} – ${fmtDate(r.to)} (${r.days} dni)`;
+  $('r-total-gross').textContent = zl(r.gross);
+  $('r-pill-main').textContent = m3(r.main);
+  $('r-pill-units').textContent = m3(r.totalNormM3);
+  $('r-pill-uchyb').textContent = (r.uchybTotalM3 > 0 ? '+' : '') + m3(r.uchybTotalM3);
+
+  const btnSave = $('btn-save-db');
+  btnSave.disabled = !!r.saved;
+  btnSave.textContent = r.saved ? '✅ Zapisano w Bazie' : '💾 Zapisz w Bazie';
+
+  $('rep-units-list').innerHTML = r.units.map((u, idx) => `
+    <div class="rep-unit">
+      <div class="rep-unit-head">
+        <div>
+          <strong style="font-size:15px;color:var(--ink)">🏠 Lokal ${u.u}</strong>
+          <div style="font-size:11px;color:var(--muted)">Odczyt: ${fmtDate(u.readDate)} • Wirt.: ${m3(u.virtualCurr)} | Fiz.: ${m3(u.rawMeterCurr ?? u.virtualCurr)}</div>
+        </div>
+        <div class="rep-unit-total">${zl(u.totalCost)}</div>
+      </div>
+
+      <div class="rep-line">
+        <span>Podany przyrost z tarczy:</span>
+        <b>${m3(u.rawUse)}</b>
+      </div>
+
+      ${(u.carryFromPrev || 0) !== 0 ? `
+        <div class="rep-line">
+          <span>🔄 Bilans z poprz. faktury:</span>
+          <b>${u.carryFromPrev > 0 ? '+' : ''}${m3(u.carryFromPrev)}</b>
+        </div>
+      ` : ''}
+
+      ${(u.diffDays !== 0 || (u.carryFromPrev || 0) !== 0) ? `
+        <div class="rep-line highlight">
+          <span>⏱ Zużycie na dzień faktury (${u.diffDays > 0 ? '+' + u.diffDays : u.diffDays}d):</span>
+          <b>${m3(u.normUse)}</b>
+        </div>
+      ` : ''}
+
+      <div class="rep-line">
+        <span>Zużycie własne (${m3(u.normUse)} × ${zl(r.rateCombined)}/m³):</span>
+        <b>${zl(u.ownCost)}</b>
+      </div>
+
+      <div class="rep-line uchyb">
+        <span>⚖️ Udział w uchybie (${u.uchybM3 > 0 ? '+' : ''}${m3(u.uchybM3)}):</span>
+        <b>${u.uchybCost > 0 ? '+' : ''}${zl(u.uchybCost)}</b>
+      </div>
+
+      <div class="rep-line">
+        <span>Abonament stały (1/6):</span>
+        <b>${zl(u.subCost)}</b>
+      </div>
+
+      <div class="rep-actions">
+        <button type="button" class="btn btn-outline btn-sm" style="flex:1" onclick="shareSingleUnit(${idx}, false)">📤 Wyślij dla ${u.u}</button>
+        <button type="button" class="btn btn-outline btn-sm" style="flex:1" onclick="shareSingleUnit(${idx}, true)">📋 Kopiuj ${u.u}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function buildGroupText(r) {
+  let t = `💧 *WODA 7 – ROZLICZENIE*\n`;
+  t += `📄 Faktura: ${r.num}\n`;
+  t += `📅 Okres: ${fmtDate(r.from)} – ${fmtDate(r.to)} (${r.days} dni)\n`;
+  t += `🔢 Licznik główny: ${m3(r.main)} | Lokale: ${m3(r.totalNormM3)} | Różnica (uchyb): ${r.uchybTotalM3 > 0 ? '+' : ''}${m3(r.uchybTotalM3)}\n`;
+  t += `💧 Stawka z faktury: ${zl(r.rateCombined)}/m³\n\n`;
+
+  r.units.forEach(u => {
+    t += `🏠 *Lokal ${u.u} ➔ DO ZAPŁATY: ${zl(u.totalCost)}*\n`;
+    if (u.diffDays !== 0 || (u.carryFromPrev || 0) !== 0) {
+      t += `   • Podano (${fmtDate(u.readDate)}): ${m3(u.rawUse)}${(u.carryFromPrev ? ` (bilans poprz.: ${u.carryFromPrev > 0 ? '+' : ''}${m3(u.carryFromPrev)})` : '')} ➔ na dzień faktury: *${m3(u.normUse)}*\n`;
+      t += `   • Koszt zużycia własnego: ${zl(u.ownCost)}\n`;
+    } else {
+      t += `   • Zużycie własne: *${m3(u.normUse)}* (${zl(u.ownCost)})\n`;
+    }
+    t += `   • Udział w uchybie (${u.uchybM3 > 0 ? '+' : ''}${m3(u.uchybM3)}): ${u.uchybCost > 0 ? '+' : ''}${zl(u.uchybCost)}\n`;
+    t += `   • Abonament (1/6): ${zl(u.subCost)}\n\n`;
+  });
+
+  t += `💰 *RAZEM ZGODNIE Z FAKTURĄ: ${zl(r.gross)}*`;
+  return t;
+}
+
+function buildUnitText(r, u) {
+  let t = `💧 *Rozliczenie wody – Lokal ${u.u}*\n`;
+  t += `Faktura: ${r.num} (${fmtDate(r.from)} – ${fmtDate(r.to)}, ${r.days} dni)\n\n`;
+  if (u.diffDays !== 0 || (u.carryFromPrev || 0) !== 0) {
+    t += `• Odczyt z dnia ${fmtDate(u.readDate)}: ${m3(u.rawUse)}\n`;
+    if (u.carryFromPrev) t += `• Przesunięcie z poprz. okresu: ${u.carryFromPrev > 0 ? '+' : ''}${m3(u.carryFromPrev)}\n`;
+    t += `• Zużycie przeliczone na dzień faktury: *${m3(u.normUse)}*\n`;
+  } else {
+    t += `• Zużycie z podlicznika: *${m3(u.normUse)}*\n`;
+  }
+  t += `• Woda i ścieki (${zl(r.rateCombined)}/m³): ${zl(u.ownCost)}\n`;
+  t += `• Udział w różnicy licznika głównego (${u.uchybM3 > 0 ? '+' : ''}${m3(u.uchybM3)}): ${u.uchybCost > 0 ? '+' : ''}${zl(u.uchybCost)}\n`;
+  t += `• Abonament (1/6): ${zl(u.subCost)}\n`;
+  t += `\n💰 *Do zapłaty: ${zl(u.totalCost)}*`;
+  return t;
+}
+
+function buildReportTSV(r) {
+  const header = ['Lokal', 'Data_odczytu', 'Podano_m3', 'Bilans_poprz_m3', 'Na_dzien_faktury_m3', 'Uchyb_m3', 'Koszt_wlasny_zl', 'Koszt_uchybu_zl', 'Abonament_zl', 'Do_zaplaty_zl', 'Wirtualny_licznik_m3', 'Fizyczna_tarcza_m3'].join('\t');
+  const rows = r.units.map(u => [
+    u.u,
+    u.readDate,
+    fmt2(u.rawUse),
+    fmt2(u.carryFromPrev || 0),
+    fmt2(u.normUse),
+    fmt2(u.uchybM3),
+    fmt2(u.ownCost),
+    fmt2(u.uchybCost),
+    fmt2(u.subCost),
+    fmt2(u.totalCost),
+    fmt2(u.virtualCurr),
+    fmt2(u.rawMeterCurr ?? u.virtualCurr)
+  ].join('\t'));
+  return [header, ...rows].join('\n');
+}
+
+async function copyOrShare(text, forceCopy, customMsg) {
+  if (!forceCopy && navigator.share) {
+    try {
+      await navigator.share({ title: 'Woda 7 – Rozliczenie', text });
+      return;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    showMsg(customMsg || '📋 Skopiowano tekst rozliczenia do schowka!', 'ok');
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    showMsg(customMsg || '📋 Skopiowano tekst rozliczenia do schowka!', 'ok');
+  }
+}
+
+window.shareSingleUnit = function(idx, forceCopy) {
+  const r = state.currentReport;
+  if (!r || !r.units[idx]) return;
+  copyOrShare(buildUnitText(r, r.units[idx]), forceCopy);
+};
+
+function renderStats() {
+  const hist = sortChronologically(state.history);
+  $('stat-invoices-cnt').textContent = `${hist.length} faktur`;
+
+  if (!hist.length) {
+    $('stat-content').innerHTML = `<p style="color:var(--muted);font-size:13px;text-align:center">Brak zapisanych rozliczeń w Bazie.</p>`;
+    $('stat-uchyb-list').innerHTML = `<p style="color:var(--muted);font-size:13px;text-align:center">Brak danych historycznych.</p>`;
+    return;
+  }
+
+  const totals = {};
+  UNITS.forEach(u => { totals[u] = { m3: 0, zl: 0, uchybM3: 0, days: 0, virtualMeter: 0, rawMeter: 0, carry: 0 }; });
+
+  hist.forEach(h => {
+    const d = h.days || Math.max(1, daysBetween(h.from, h.to));
+    (h.units || []).forEach(u => {
+      if (!totals[u.u]) return;
+      totals[u.u].m3 += (u.normUse ?? u.use ?? 0);
+      totals[u.u].zl += (u.totalCost ?? u.tot ?? 0);
+      totals[u.u].uchybM3 += (u.uchybM3 ?? 0);
+      totals[u.u].days += d;
+      totals[u.u].virtualMeter = u.virtualCurr ?? totals[u.u].m3;
+      totals[u.u].rawMeter = u.rawMeterCurr ?? totals[u.u].virtualMeter;
+      totals[u.u].carry = u.carryoverNext ?? 0;
+    });
+  });
+
+  const maxM3 = Math.max(1, ...UNITS.map(u => totals[u].m3));
+
+  let html = `
+    <div style="overflow-x:auto">
+    <table class="stat-table">
+      <thead>
+        <tr>
+          <th>Lokal</th>
+          <th>Fiz. tarcza</th>
+          <th>Wirt. licznik</th>
+          <th>Bilans m³</th>
+          <th>Śr. l/d</th>
+          <th>Suma zł</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  UNITS.forEach(u => {
+    const t = totals[u];
+    const lPerDay = t.days > 0 ? Math.round((t.m3 * 10) / t.days) : 0;
+    const cStr = t.carry === 0 ? '0,00' : (t.carry > 0 ? '+' + fmt2(t.carry) : fmt2(t.carry));
+    html += `
+      <tr>
+        <td>🏠 ${u}</td>
+        <td>${m3(t.rawMeter)}</td>
+        <td><b>${m3(t.virtualMeter)}</b></td>
+        <td style="color:${t.carry !== 0 ? 'var(--amber)' : 'var(--muted)'};font-weight:700">${cStr}</td>
+        <td>${lPerDay} l/d</td>
+        <td><b>${zl(t.zl)}</b></td>
+      </tr>
+    `;
+  });
+  html += `</tbody></table></div><div style="margin-top:14px">`;
+
+  UNITS.forEach(u => {
+    const t = totals[u];
+    const pct = Math.round((t.m3 / maxM3) * 100);
+    html += `
+      <div class="bar-row">
+        <div class="bar-label"><span>Lokal ${u} (Uchyb: ${t.uchybM3 > 0 ? '+' : ''}${m3(t.uchybM3)})</span><span>${m3(t.m3)} • ${zl(t.zl)}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+  $('stat-content').innerHTML = html;
+
+  $('stat-uchyb-list').innerHTML = [...hist].reverse().map(h => {
+    const uM3 = h.uchybTotalM3 ?? h.uchybM3 ?? 0;
+    const pct = h.main > 0 ? ((uM3 / h.main) * 100).toFixed(1) : '0.0';
+    return `
+      <div class="rep-line" style="padding:8px 0;border-bottom:1px solid #f1f5f9">
+        <span><b>${h.num}</b> (${fmtDate(h.from)}–${fmtDate(h.to)}, ${h.days}d)</span>
+        <span>Główny: ${m3(h.main)} • Uchyb: <b>${uM3 > 0 ? '+' : ''}${m3(uM3)} (${pct}%)</b></span>
+      </div>
+    `;
+  }).join('');
+}
+
+window.editHistoryRecord = function(id) {
+  const found = state.history.find(h => h.id === id);
+  if (!found) return;
+  $('f-num').value = found.num;
+  $('f-from').value = found.from;
+  $('f-to').value = found.to;
+  $('f-main').value = (found.main / 100).toFixed(2);
+  $('f-sub').value = (found.sub / 100).toFixed(2);
+  $('f-wat').value = found.wat ? (found.wat / 100).toFixed(2) : '';
+  $('f-sew').value = found.sew ? (found.sew / 100).toFixed(2) : '';
+  $('f-watsew').value = ((found.gross - found.sub) / 100).toFixed(2);
+  $('f-gross').value = (found.gross / 100).toFixed(2);
+
+  state.inputMode = found.inputMode || 'use';
+  state.lastSyncedInvTo = found.to;
+  state.grossManual = true;
+  updateModeButtons();
+  updateInvoicePreview();
+
+  const preserve = {};
+  state.manualPrevMeters = {};
+  (found.units || []).forEach(u => {
+    const k = u.u.replace('/', '-');
+    if (u.rawPrevInt !== undefined) state.manualPrevMeters[u.u] = u.rawPrevInt;
+    const valInt = state.inputMode === 'meter' ? (u.rawMeterCurr ?? u.virtualCurr) : u.rawUse;
+    preserve[k] = {
+      val: (valInt / 100).toFixed(2),
+      date: u.readDate || found.to,
+      prev: u.rawPrevInt !== undefined ? (u.rawPrevInt / 100).toFixed(2) : ''
+    };
+  });
+  renderUnitsForm(preserve);
+  saveDraft();
+  switchTab(2);
+  showMsg(`✏️ Załadowano fakturę ${found.num} do edycji.`, 'ok');
+};
+
+function renderHistory() {
+  const list = $('history-list');
+  if (!state.history.length) {
+    list.innerHTML = `<p style="color:var(--muted);font-size:13px;text-align:center">Baza rozliczeń jest pusta.</p>`;
+    return;
+  }
+  const sorted = sortChronologically(state.history).reverse();
+  list.innerHTML = sorted.map(h => `
+    <div class="rep-unit" style="margin-bottom:8px">
+      <div class="rep-unit-head">
+        <div>
+          <strong style="color:var(--ink)">${h.num}</strong>
+          <div style="font-size:11.5px;color:var(--muted)">${fmtDate(h.from)} – ${fmtDate(h.to)} (${h.days || daysBetween(h.from, h.to)} dni) • Główny: ${m3(h.main)}</div>
+        </div>
+        <div class="rep-unit-total">${zl(h.gross)}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button type="button" class="btn btn-outline btn-sm" style="flex:1" onclick="openHistoryRecord(${h.id})">📄 Raport</button>
+        <button type="button" class="btn btn-outline btn-sm" style="flex:1" onclick="editHistoryRecord(${h.id})">✏️ Edytuj</button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="deleteHistoryRecord(${h.id})">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.openHistoryRecord = function(id) {
+  const found = state.history.find(h => h.id === id);
+  if (!found) return;
+  state.currentReport = JSON.parse(JSON.stringify(found));
+  state.currentReport.saved = true;
+  renderReport();
+  switchTab(3);
+};
+
+window.deleteHistoryRecord = function(id) {
+  const found = state.history.find(h => h.id === id);
+  if (!found) return;
+  if (!confirm(`Czy na pewno usunąć rozliczenie faktury ${found.num} z Bazy? Wszystkie późniejsze faktury zostaną automatycznie przeliczone.`)) return;
+  state.history = state.history.filter(h => h.id !== id);
+  saveDatabase();
+  renderHistory();
+  updateInvoicePreview();
+  renderUnitsForm();
+};
+
+async function exportDatabaseWithPicker() {
+  const payload = JSON.stringify({
+    app: 'wsp7',
+    v: 10,
+    exportedAt: new Date().toISOString(),
+    history: state.history
+  }, null, 2);
+  const fileName = `Woda7_Baza_${new Date().toISOString().slice(0, 10)}.json`;
+
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{ description: 'Baza danych JSON', accept: { 'application/json': ['.json'] } }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(payload);
+      await writable.close();
+      showMsg('💾 Baza została zapisana we wskazanym miejscu!', 'ok');
+      return;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+  }
+
+  const fileObj = new File([payload], fileName, { type: 'application/json' });
+  if (navigator.canShare && navigator.canShare({ files: [fileObj] })) {
+    try {
+      await navigator.share({ files: [fileObj], title: 'Woda 7 – Kopia bazy' });
+      showMsg('📤 Wybrano miejsce zapisu pliku bazy.', 'ok');
+      return;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+  }
+
+  const blob = new Blob([payload], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  showMsg('💾 Plik bazy został pobrany do pamięci telefonu.', 'ok');
+}
+
+function buildPdfLines(items) {
+  const a = items.filter(i => i.str && i.str.trim()).map(i => ({
+    s: /^[\d\s,.\-:;\/]+$/.test(i.str) ? i.str.replace(/\s+/g, '') : i.str,
+    x: i.transform ? i.transform[4] : 0,
+    y: i.transform ? i.transform[5] : 0,
+    w: i.width || 0,
+    h: (i.transform ? Math.abs(i.transform[3]) : 8) || 8
+  })).sort((p, q) => q.y - p.y);
+  const L = [];
+  a.forEach(i => {
+    const l = L[L.length - 1];
+    if (l && Math.abs(l.y - i.y) < 3.5) l.a.push(i);
+    else L.push({ y: i.y, a: [i] });
+  });
+  return L.map(l => {
+    l.a.sort((p, q) => p.x - q.x);
+    let t = '', e = null;
+    l.a.forEach(i => {
+      t += (e !== null && i.x - e > i.h * 0.15 ? ' ' : '') + i.s;
+      e = i.x + i.w;
+    });
+    return t;
+  }).join('\n');
+}
+
+function parseZukInvoiceText(rawText) {
+  const clean = rawText
+    .replace(/[ \t]+/g, ' ')
+    .replace(/(\d{4}) ?- ?(\d{2}) ?- ?(\d{2})/g, '$1-$2-$3')
+    .replace(/(\d) ?, ?(\d)/g, '$1,$2')
+    .replace(/ ?\/ ?/g, '/');
+
+  const out = {};
+  const mNum = clean.match(/faktury ?nr ?:? ?(\S+)/i);
+  if (mNum) out.num = mNum[1];
+
+  let w = 0, s = 0, u = 0, q = 0, k = 0, fr = '', to = '';
+
+  const patVisual = /(\d{4}-\d{2}-\d{2})\s+(\d{4}-\d{2}-\d{2})\s+(m ?[3³]|s ?z ?t)\s+(\d[\d ]*,\d+)\s+(\d[\d ]*,\d+)\s+(\d[\d ]*,\d+)\s+(\d[\d ]*,\d+)/gi;
+  const visualMatches = [...clean.matchAll(patVisual)];
+
+  if (visualMatches.length > 0) {
+    visualMatches.forEach(r => {
+      const g = toInt(r[7]);
+      const pre = clean.slice(Math.max(0, r.index - 35), r.index).replace(/\s+/g, '');
+      if (/^m/i.test(r[3])) {
+        k++;
+        if (/cieki/i.test(pre) || (k % 2 === 0 && !/wod/i.test(pre))) s += g;
+        else { w += g; q += toInt(r[4]); }
+        if (!fr || r[1] < fr) fr = r[1];
+        if (r[2] > to) to = r[2];
+      } else {
+        u += g;
+      }
+    });
+  } else {
+    const patStream = /(m ?[3³]|s ?z ?t)\s+(\d[\d ]*,\d+)\s+(\d[\d ]*,\d+)\s+(\d[\d ]*,\d+)\s+(\d[\d ]*,\d+?)(?:\s+\d+)?\s+(\d{4}-\d{2}-\d{2})\s+(\d{4}-\d{2}-\d{2})/gi;
+    for (const r of clean.matchAll(patStream)) {
+      let grossStr = r[5].replace(/\s+/g, '');
+      if (/,\d{3}$/.test(grossStr)) grossStr = grossStr.slice(0, -1);
+      const g = toInt(grossStr);
+      const pre = clean.slice(Math.max(0, r.index - 45), r.index).replace(/\s+/g, '');
+      const dFrom = r[6], dTo = r[7];
+      if (/^m/i.test(r[1])) {
+        k++;
+        if (/cieki/i.test(pre) || (k % 2 === 0 && !/wod/i.test(pre))) s += g;
+        else { w += g; q += toInt(r[2]); }
+        if (!fr || dFrom < fr) fr = dFrom;
+        if (dTo > to) to = dTo;
+      } else {
+        u += g;
+      }
+    }
+  }
+
+  const mIssue = clean.match(/Data wystawienia\s*:?\s*(\d{4}-\d{2}-\d{2})/i);
+  if (mIssue) out.issueDate = mIssue[1];
+
+  if (!to) {
+    const mReadCurr = clean.match(/Odczyt bie.{1,3}cy\s*:?\s*(\d{4}-\d{2}-\d{2})/i);
+    if (mReadCurr) to = mReadCurr[1];
+  }
+  if (!fr) {
+    const mReadPrev = clean.match(/Poprzedni\s*:?\s*(\d{4}-\d{2}-\d{2})/i);
+    if (mReadPrev) fr = mReadPrev[1];
+  }
+
+  if (!q) {
+    const mMeter = clean.match(/=\s*(\d[\d ]*,\d+)\s*m ?[3³]/i);
+    if (mMeter) q = toInt(mMeter[1]);
+  }
+
+  if (fr) out.from = fr;
+  if (to) out.to = to;
+  if (q) out.main = (q / 100).toFixed(2);
+  if (u) out.sub = (u / 100).toFixed(2);
+  if (w) out.wat = (w / 100).toFixed(2);
+  if (s) out.sew = (s / 100).toFixed(2);
+
+  const mGross = clean.replace(/\s+/g, '').match(/zap.{0,3}aty:?(\d+,\d{2})PLN/i);
+  if (mGross) {
+    out.gross = (toInt(mGross[1]) / 100).toFixed(2);
+  } else if (w + s + u > 0) {
+    out.gross = ((w + s + u) / 100).toFixed(2);
+  }
+
+  return out;
+}
+
+async function handleInvoiceFile(file) {
+  if (!file) return;
+  const infoBox = $('inv-file-info');
+  infoBox.style.display = 'none';
+
+  if (/\.xml$/i.test(file.name) || /xml/i.test(file.type)) {
+    try {
+      const xmlText = await file.text();
+      const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+      const getTag = tag => {
+        const el = doc.getElementsByTagName(tag)[0] || doc.querySelector(`[*|${tag}]`);
+        return el ? el.textContent.trim() : '';
+      };
+      const num = getTag('P_2');
+      const issueDateXml = getTag('P_1');
+      let rowDeliveryDate = '';
+      Array.from(doc.getElementsByTagName('FaWiersz')).forEach(r => {
+        const n = (r.getElementsByTagName('P_7')[0]?.textContent || '').toLowerCase();
+        const dRow = r.getElementsByTagName('P_6A')[0]?.textContent?.trim() || '';
+        if (dRow && (n.includes('wod') || n.includes('ściek') || n.includes('sciek'))) {
+          if (!rowDeliveryDate || dRow > rowDeliveryDate) rowDeliveryDate = dRow;
+        }
+      });
+      const dateTo = getTag('P_6_Do') || getTag('P_6') || rowDeliveryDate || issueDateXml;
+      const dateFrom = getTag('P_6_Od');
+      const gross = getTag('P_15');
+      state.invoiceIssueDate = issueDateXml || '';
+
+      let wat = 0, sew = 0, sub = 0, mainM3 = 0, sewM3 = 0;
+      const rows = Array.from(doc.getElementsByTagName('FaWiersz'));
+      rows.forEach(r => {
+        const name = (r.getElementsByTagName('P_7')[0]?.textContent || '').toLowerCase();
+        const unit = (r.getElementsByTagName('P_8A')[0]?.textContent || '').toLowerCase();
+        const qty = toInt(r.getElementsByTagName('P_8B')[0]?.textContent || '0');
+        const valGross = toInt(r.getElementsByTagName('P_11Vat')[0]?.textContent || '0') + toInt(r.getElementsByTagName('P_11')[0]?.textContent || '0');
+        const lineGross = toInt(r.getElementsByTagName('P_11A')[0]?.textContent || '0') || valGross;
+
+        if (name.includes('abonament') || unit.includes('szt') || unit.includes('mies')) {
+          sub += lineGross;
+        } else if (name.includes('ściek') || name.includes('sciek')) {
+          sew += lineGross;
+          sewM3 += qty;
+        } else if (name.includes('wod')) {
+          wat += lineGross;
+          mainM3 += qty;
+        }
+      });
+      if (!mainM3 && sewM3) mainM3 = sewM3;
+
+      ['f-num', 'f-from', 'f-to', 'f-main', 'f-sub', 'f-wat', 'f-sew', 'f-watsew', 'f-gross'].forEach(id => {
+        if ($(id)) { $(id).value = ''; $(id).classList.remove('autofilled', 'manual-edit'); }
+      });
+
+      if (num) { $('f-num').value = num; $('f-num').classList.add('autofilled'); }
+      if (dateFrom) { $('f-from').value = dateFrom; $('f-from').classList.add('autofilled'); }
+      if (dateTo) { $('f-to').value = dateTo; $('f-to').classList.add('autofilled'); }
+      if (mainM3) { $('f-main').value = (mainM3 / 100).toFixed(2); $('f-main').classList.add('autofilled'); }
+      if (sub) { $('f-sub').value = (sub / 100).toFixed(2); $('f-sub').classList.add('autofilled'); }
+      if (wat) { $('f-wat').value = (wat / 100).toFixed(2); }
+      if (sew) { $('f-sew').value = (sew / 100).toFixed(2); }
+      if (wat + sew > 0) { $('f-watsew').value = ((wat + sew) / 100).toFixed(2); $('f-watsew').classList.add('autofilled'); }
+      if (gross) { $('f-gross').value = parseFloat(gross).toFixed(2); $('f-gross').classList.add('autofilled'); }
+
+      updateInvoicePreview();
+      renderUnitsForm();
+      syncUnitDatesWithInvoice($('f-to').value, true);
+      UNITS.forEach(updateUnitLive);
+      saveDraft();
+$('pdf-preview-wrap').hidden = true;
+      infoBox.textContent = `✅ Wczytano fakturę KSeF (${file.name}). Data odczytu lokali została zsynchronizowana z fakturą.`;
+      infoBox.style.display = 'block';
+    } catch (e) {
+      showMsg('Nie udało się odczytać pliku XML KSeF – uzupełnij pola ręcznie.', 'err');
+    }
+    return;
+  }
+
+  try {
+    infoBox.textContent = '⏳ Odczytywanie pliku PDF...';
+    infoBox.style.display = 'block';
+    if (!window.pdfjsLib) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        s.onload = () => {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          res();
+        };
+        s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+    const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+    let visualText = '';
+    let streamText = '';
+    for (let p = 1; p <= Math.min(pdf.numPages, 4); p++) {
+      const page = await pdf.getPage(p);
+      const tc = await page.getTextContent();
+      visualText += buildPdfLines(tc.items) + '\n';
+      streamText += tc.items.map(i => i.str).join(' ') + '\n';
+    }
+
+    const parsedVisual = parseZukInvoiceText(visualText);
+    const parsedStream = parseZukInvoiceText(streamText);
+    const merged = { ...parsedStream, ...parsedVisual };
+    state.invoiceIssueDate = merged.issueDate || '';
+
+    // Renderowanie stron PDF do obrazów HD (DataURL) - pozwala na natywne szczypanie palcami i pełny ekran!
+    const pageImages = [];
+    for (let p = 1; p <= Math.min(pdf.numPages, 3); p++) {
+      try {
+        const page = await pdf.getPage(p);
+        const viewport = page.getViewport({ scale: 2.2 });
+        const c = document.createElement('canvas');
+        c.width = viewport.width;
+        c.height = viewport.height;
+        await page.render({ canvasContext: c.getContext('2d'), viewport }).promise;
+        pageImages.push(c.toDataURL('image/jpeg', 0.92));
+      } catch (err) {}
+    }
+    showCleanPdfPreview(pageImages, file.name, pdf.numPages);
+
+    const fieldMap = {
+      num: 'f-num',
+      from: 'f-from',
+      to: 'f-to',
+      main: 'f-main',
+      sub: 'f-sub',
+      wat: 'f-wat',
+      sew: 'f-sew',
+      gross: 'f-gross'
+    };
+
+    ['f-num', 'f-from', 'f-to', 'f-main', 'f-sub', 'f-wat', 'f-sew', 'f-watsew', 'f-gross'].forEach(id => {
+      if ($(id)) { $(id).value = ''; $(id).classList.remove('autofilled', 'manual-edit'); }
+    });
+
+    let filledCount = 0;
+    Object.entries(fieldMap).forEach(([key, id]) => {
+      if (merged[key] !== undefined && merged[key] !== '') {
+        $(id).value = merged[key];
+        $(id).classList.add('autofilled');
+        filledCount++;
+      }
+    });
+    const wInt = toInt(merged.wat || 0), sInt = toInt(merged.sew || 0);
+    const gInt = toInt(merged.gross || 0), subInt = toInt(merged.sub || 0);
+    if (wInt + sInt > 0) {
+      $('f-watsew').value = ((wInt + sInt) / 100).toFixed(2);
+      $('f-watsew').classList.add('autofilled');
+    } else if (gInt > subInt) {
+      $('f-watsew').value = ((gInt - subInt) / 100).toFixed(2);
+      $('f-watsew').classList.add('autofilled');
+    }
+
+    updateInvoicePreview();
+    renderUnitsForm();
+    syncUnitDatesWithInvoice($('f-to').value, true);
+    UNITS.forEach(updateUnitLive);
+    saveDraft();
+
+    if (filledCount >= 6) {
+      infoBox.className = 'alert ok';
+      infoBox.textContent = `✅ Odczytano komplet danych (${filledCount}/8 pól) z pliku ${file.name}. Daty odczytu 6 lokali ustawiono na ${fmtDate($('f-to').value)}.`;
+    } else if (filledCount > 0) {
+      infoBox.className = 'alert warn';
+      infoBox.textContent = `⚠️ Odczytano częściowo (${filledCount}/8 pól) z pliku ${file.name}. Uzupełnij brakujące pola ręcznie.`;
+    } else {
+      infoBox.className = 'alert err';
+      infoBox.textContent = `⚠️ Nie rozpoznano tabeli ZUK w pliku ${file.name} – wpisz dane ręcznie.`;
+    }
+    infoBox.style.display = 'block';
+  } catch (e) {
+    infoBox.style.display = 'none';
+    showMsg('Nie udało się automatycznie odczytać PDF (sprawdź połączenie z internetem dla czytnika PDF) – wpisz wartości ręcznie.', 'warn');
+  }
+}
+
+function switchInputMode(newMode) {
+  if (state.inputMode === newMode) return;
+  const converted = {};
+  UNITS.forEach(u => {
+    const k = u.replace('/', '-');
+    const valStr = $('uval-' + k)?.value || '';
+    const dtStr = $('udate-' + k)?.value || '';
+    const prevEl = $('uprev-' + k);
+    if (prevEl && prevEl.value !== '') {
+      state.manualPrevMeters[u] = toInt(prevEl.value);
+    }
+    const baseRaw = getEffectivePrevMeter(u);
+    const prevFormatted = (baseRaw / 100).toFixed(2);
+    if (valStr !== '') {
+      const vInt = toInt(valStr);
+      if (state.inputMode === 'use' && newMode === 'meter') {
+        converted[k] = { val: ((baseRaw + vInt) / 100).toFixed(2), date: dtStr, prev: prevFormatted };
+      } else if (state.inputMode === 'meter' && newMode === 'use') {
+        converted[k] = { val: (Math.max(0, vInt - baseRaw) / 100).toFixed(2), date: dtStr, prev: prevFormatted };
+      }
+    } else {
+      converted[k] = { val: '', date: dtStr, prev: prevFormatted };
+    }
+  });
+  state.inputMode = newMode;
+  updateModeButtons();
+  renderUnitsForm(converted);
+  saveDraft();
+}
+
+function saveDraft() {
+  try {
+    const inv = {};
+    ['f-num', 'f-from', 'f-to', 'f-main', 'f-sub', 'f-wat', 'f-sew', 'f-watsew', 'f-gross'].forEach(id => {
+      if ($(id)) inv[id] = $(id).value;
+    });
+    const uDraft = {};
+    UNITS.forEach(u => {
+      const k = u.replace('/', '-');
+      const baseRaw = $('uprev-' + k) ? toInt($('uprev-' + k).value) : getEffectivePrevMeter(u);
+      uDraft[k] = {
+        val: $('uval-' + k)?.value || '',
+        date: $('udate-' + k)?.value || '',
+        prev: (baseRaw / 100).toFixed(2)
+      };
+    });
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ inputMode: state.inputMode, manualPrevMeters: state.manualPrevMeters, inv, uDraft }));
+  } catch (e) {}
+}
+
+function restoreDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.inputMode) state.inputMode = d.inputMode;
+    if (d.manualPrevMeters) state.manualPrevMeters = d.manualPrevMeters;
+    if (d.inv) {
+      Object.entries(d.inv).forEach(([id, val]) => { if ($(id)) $(id).value = val; });
+    }
+    updateModeButtons();
+    updateInvoicePreview();
+    renderUnitsForm(d.uDraft || {});
+  } catch (e) {}
+}
+
+function updateModeButtons() {
+  $('mode-use').classList.toggle('on', state.inputMode === 'use');
+  $('mode-meter').classList.toggle('on', state.inputMode === 'meter');
+}
+
+window.switchTab = function(t) {
+  for (let i = 1; i <= 5; i++) {
+    $('tab-' + i).hidden = (i !== t);
+    document.querySelector(`.nav-btn[data-tab="${i}"]`).classList.toggle('active', i === t);
+  }
+  showMsg('');
+  if (t === 2) {
+    syncUnitDatesWithInvoice($('f-to').value, false);
+    UNITS.forEach(updateUnitLive);
+    updateLiveBalanceBar();
+  }
+  if (t === 3) renderReport();
+  if (t === 4) renderStats();
+  if (t === 5) renderHistory();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(Number(btn.dataset.tab)));
+});
+
+['f-from', 'f-to'].forEach(id => {
+  $(id).addEventListener('click', () => {
+    if (typeof $(id).showPicker === 'function') { try { $(id).showPicker(); } catch (e) {} }
+  });
+});
+
+// Prawdziwy kalkulator na żywo + podświetlanie ręcznych zmian na żółto (.manual-edit)
+['f-num', 'f-from', 'f-to', 'f-main', 'f-sub', 'f-watsew', 'f-gross'].forEach(id => {
+  $(id).addEventListener('input', () => {
+    const el = $(id);
+    if (id !== 'f-num' && id !== 'f-from' && id !== 'f-to') {
+      sanitizeDecimalInput(el);
+    }
+    el.classList.remove('autofilled');
+    if (el.value.trim() !== '') el.classList.add('manual-edit');
+    else el.classList.remove('manual-edit');
+
+    // Jeśli użytkownik ręcznie zmienia łączną kwotę "Woda i ścieki", zerujemy ukryty podział z PDF
+    // i od razu przeliczamy "Razem do zapłaty brutto" jak w kalkulatorze!
+    if (id === 'f-watsew' || id === 'f-sub') {
+      if (id === 'f-watsew') {
+        $('f-wat').value = '';
+        $('f-sew').value = '';
+      }
+      const ws = toInt($('f-watsew').value);
+      const sb = toInt($('f-sub').value);
+      const calcGross = ws + sb;
+      $('f-gross').value = calcGross > 0 ? (calcGross / 100).toFixed(2) : '';
+      $('f-gross').classList.remove('autofilled');
+      if (calcGross > 0) $('f-gross').classList.add('manual-edit');
+    } else if (id === 'f-gross') {
+      // Jeśli wpisano samo Brutto i Abonament, kalkulator wylicza Woda+Ścieki
+      const gr = toInt($('f-gross').value);
+      const sb = toInt($('f-sub').value);
+      if (gr >= sb && gr > 0) {
+        $('f-watsew').value = ((gr - sb) / 100).toFixed(2);
+        $('f-wat').value = '';
+        $('f-sew').value = '';
+        $('f-watsew').classList.remove('autofilled');
+        $('f-watsew').classList.add('manual-edit');
+      }
+    }
+
+    updateInvoicePreview();
+    if (id === 'f-to') {
+      syncUnitDatesWithInvoice($('f-to').value, false);
+    }
+    if (id === 'f-num' || id === 'f-from' || id === 'f-to') {
+      const currentVals = {};
+      UNITS.forEach(u => {
+        const k = u.replace('/', '-');
+        currentVals[k] = {
+          val: $('uval-' + k)?.value || '',
+          date: $('udate-' + k)?.value || $('f-to').value || '',
+          prev: $('uprev-' + k)?.value || ''
+        };
+      });
+      renderUnitsForm(currentVals);
+    } else {
+      UNITS.forEach(updateUnitLive);
+      updateLiveBalanceBar();
+    }
+    saveDraft();
+  });
+});
+
+$('btn-unlock-prev').addEventListener('click', () => {
+  state.unlockPrev = !state.unlockPrev;
+  const currentVals = {};
+  UNITS.forEach(u => {
+    const k = u.replace('/', '-');
+    currentVals[k] = {
+      val: $('uval-' + k)?.value || '',
+      date: $('udate-' + k)?.value || '',
+      prev: $('uprev-' + k)?.value || ''
+    };
+  });
+  renderUnitsForm(currentVals);
+});
+
+$('btn-import-inv').addEventListener('click', () => $('file-inv').click());
+
+// Czysty podgląd faktury PDF (bez zwijania/rozwijania)
+function showCleanPdfPreview(pageImages, fileName, totalPages) {
+  const wrap = $('pdf-preview-wrap');
+  const pagesBox = $('pdf-clean-pages');
+  const caption = $('pdf-clean-caption');
+
+  if (!pageImages || !pageImages.length) {
+    wrap.hidden = true;
+    return;
+  }
+
+  pagesBox.innerHTML = pageImages.map((src, i) => `<img src="${src}" alt="Faktura PDF – strona ${i + 1}">`).join('');
+  caption.textContent = `Plik: ${fileName} (${totalPages === 1 ? '1 strona' : 'strony: ' + pageImages.length + '/' + totalPages}) • Rozsuń dwoma palcami, aby powiększyć`;
+  wrap.hidden = false;
+}
+
+$('file-inv').addEventListener('change', e => {
+  handleInvoiceFile(e.target.files[0]);
+  e.target.value = '';
+});
+
+$('btn-to-step2').addEventListener('click', () => {
+  syncUnitDatesWithInvoice($('f-to').value, false);
+  switchTab(2);
+});
+
+$('mode-use').addEventListener('click', () => switchInputMode('use'));
+$('mode-meter').addEventListener('click', () => switchInputMode('meter'));
+
+$('btn-calc').addEventListener('click', calculateSettlement);
+
+$('btn-share-all').addEventListener('click', () => {
+  if (state.currentReport) copyOrShare(buildGroupText(state.currentReport), false);
+});
+$('btn-copy-all').addEventListener('click', () => {
+  if (state.currentReport) copyOrShare(buildGroupText(state.currentReport), true);
+});
+$('btn-copy-tsv').addEventListener('click', () => {
+  if (state.currentReport) copyOrShare(buildReportTSV(state.currentReport), true, '📊 Skopiowano tabelę TSV – możesz wkleić ją bezpośrednio do Excela (Ctrl+V)!');
+});
+
+// Natywne budowanie pliku PDF 1.4 z obiektu Canvas
+function canvasToPdfBlob(canvas) {
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.94);
+  const base64 = dataUrl.split(',')[1];
+  const binStr = atob(base64);
+  const jpegBytes = new Uint8Array(binStr.length);
+  for (let i = 0; i < binStr.length; i++) jpegBytes[i] = binStr.charCodeAt(i);
+
+  const imgW = canvas.width;
+  const imgH = canvas.height;
+  const pageW = 595.28;
+  const pageH = Number((pageW * (imgH / imgW)).toFixed(2));
+
+  const enc = str => {
+    const arr = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) arr[i] = str.charCodeAt(i) & 0xff;
+    return arr;
+  };
+
+  const contentStr = `q ${pageW} 0 0 ${pageH} 0 0 cm /Im1 Do Q`;
+  const obj1 = enc("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+  const obj2 = enc("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");
+  const obj3 = enc(`3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n`);
+  const obj4Head = enc(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${imgW} /Height ${imgH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`);
+  const obj4Foot = enc("\nendstream\nendobj\n");
+  const obj5 = enc(`5 0 obj\n<< /Length ${contentStr.length} >>\nstream\n${contentStr}\nendstream\nendobj\n`);
+
+  const header = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34, 0x0a, 0x25, 0xaa, 0xab, 0xac, 0xad, 0x0a]);
+  const chunks = [header];
+  const offsets = [];
+  let curLen = header.length;
+
+  const pushChunk = arr => { chunks.push(arr); curLen += arr.length; };
+
+  offsets.push(curLen); pushChunk(obj1);
+  offsets.push(curLen); pushChunk(obj2);
+  offsets.push(curLen); pushChunk(obj3);
+  offsets.push(curLen); pushChunk(obj4Head); pushChunk(jpegBytes); pushChunk(obj4Foot);
+  offsets.push(curLen); pushChunk(obj5);
+
+  const xrefPos = curLen;
+  let xrefStr = `xref\n0 6\n0000000000 65535 f \n`;
+  offsets.forEach(off => { xrefStr += String(off).padStart(10, '0') + " 00000 n \n"; });
+  xrefStr += `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF\n`;
+  pushChunk(enc(xrefStr));
+
+  return new Blob(chunks, { type: 'application/pdf' });
+}
+
+async function savePdfBlob(blob, fileName) {
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{ description: 'Dokument PDF', accept: { 'application/pdf': ['.pdf'] } }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      showMsg(`📄 Zapisano plik PDF (${fileName}) we wskazanym miejscu!`, 'ok');
+      return;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+  }
+
+  const fileObj = new File([blob], fileName, { type: 'application/pdf' });
+  if (navigator.canShare && navigator.canShare({ files: [fileObj] })) {
+    try {
+      await navigator.share({ files: [fileObj], title: fileName });
+      showMsg(`📄 Udostępniono / zapisano plik PDF (${fileName}).`, 'ok');
+      return;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+  }
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  showMsg(`📄 Pobrano plik PDF (${fileName}).`, 'ok');
+}
+
+function exportReportToPDF() {
+  const r = state.currentReport;
+  if (!r) return;
+  const W = 1240;
+  const H = 1754;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(50, 45, W - 100, 130);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 32px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('WODA 7 – ROZLICZENIE WODY I ŚCIEKÓW', 80, 98, W - 160);
+  ctx.fillStyle = '#93c5fd';
+  ctx.font = '600 21px sans-serif';
+  ctx.fillText(`Faktura: ${r.num}   •   Okres: ${fmtDate(r.from)} – ${fmtDate(r.to)} (${r.days} dni)`, 80, 142, W - 160);
+
+  const boxY = 195;
+  const boxH = 105;
+  const summaryBoxes = [
+    { title: 'RAZEM FAKTURA BRUTTO', val: zl(r.gross), bg: '#ecfdf5', bd: '#6ee7b7', col: '#065f46' },
+    { title: 'LICZNIK GŁÓWNY', val: m3(r.main), bg: '#f8fafc', bd: '#cbd5e1', col: '#0f172a' },
+    { title: 'SUMA 6 LOKALI', val: m3(r.totalNormM3), bg: '#f8fafc', bd: '#cbd5e1', col: '#0f172a' },
+    { title: `UCHYB (STAWKA ${zl(r.rateCombined)}/m³)`, val: (r.uchybTotalM3 > 0 ? '+' : '') + m3(r.uchybTotalM3), bg: '#eff6ff', bd: '#93c5fd', col: '#1e3a8a' }
+  ];
+  const sbW = (W - 100 - 36) / 4;
+  summaryBoxes.forEach((b, idx) => {
+    const bx = 50 + idx * (sbW + 12);
+    ctx.fillStyle = b.bg;
+    ctx.strokeStyle = b.bd;
+    ctx.lineWidth = 2;
+    ctx.fillRect(bx, boxY, sbW, boxH);
+    ctx.strokeRect(bx, boxY, sbW, boxH);
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(b.title, bx + sbW / 2, boxY + 34, sbW - 16);
+
+    ctx.fillStyle = b.col;
+    ctx.font = 'bold 26px sans-serif';
+    ctx.fillText(b.val, bx + sbW / 2, boxY + 76, sbW - 16);
+  });
+  ctx.textAlign = 'left';
+
+  const colW = (W - 124) / 2;
+  const rowH = 415;
+  r.units.forEach((u, i) => {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const x = 50 + col * (colW + 24);
+    const y = 325 + row * (rowH + 22);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 2;
+    ctx.fillRect(x, y, colW, rowH);
+    ctx.strokeRect(x, y, colW, rowH);
+
+    ctx.fillStyle = '#f1f5f9';
+    ctx.fillRect(x, y, colW, 60);
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 25px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Lokal ${u.u}`, x + 20, y + 40, 240);
+
+    ctx.fillStyle = '#059669';
+    ctx.font = 'bold 26px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(`Do zapłaty: ${zl(u.totalCost)}`, x + colW - 20, y + 40, 270);
+    ctx.textAlign = 'left';
+
+    let ly = y + 98;
+    const drawRow = (label, val, boldVal = false, color = '#1e293b') => {
+      ctx.font = (boldVal ? 'bold ' : '600 ') + '18px sans-serif';
+      const valMaxW = 195;
+      const measuredValW = Math.min(valMaxW, ctx.measureText(val).width);
+      const labelMaxW = colW - 40 - measuredValW - 18;
+
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + 18, ly + 11);
+      ctx.lineTo(x + colW - 18, ly + 11);
+      ctx.stroke();
+
+      ctx.fillStyle = '#475569';
+      ctx.font = '500 17px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(label, x + 20, ly, labelMaxW);
+
+      ctx.fillStyle = color;
+      ctx.font = (boldVal ? 'bold ' : '600 ') + '18px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(val, x + colW - 20, ly, valMaxW);
+      ctx.textAlign = 'left';
+      ly += 44;
+    };
+
+    drawRow(`Odczyt z dnia ${fmtDate(u.readDate)}:`, m3(u.rawUse), true);
+    drawRow('Przesunięcie z poprz. okresu:', ((u.carryFromPrev || 0) > 0 ? '+' : '') + m3(u.carryFromPrev || 0));
+    drawRow(`Zużycie na dzień faktury (${u.diffDays > 0 ? '+' + u.diffDays : u.diffDays}d):`, m3(u.normUse), true, '#b45309');
+    drawRow(`Koszt zużycia własnego:`, zl(u.ownCost), true);
+    drawRow(`Udział w uchybie (${u.uchybM3 > 0 ? '+' : ''}${m3(u.uchybM3)}):`, (u.uchybCost > 0 ? '+' : '') + zl(u.uchybCost), false, '#1e3a8a');
+    drawRow(`Abonament stały (1/6):`, zl(u.subCost));
+    drawRow(`Wirt. licznik / Fiz. tarcza:`, `${m3(u.virtualCurr)} / ${m3(u.rawMeterCurr ?? u.virtualCurr)}`);
+  });
+
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '500 16px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(`Wygenerowano w aplikacji Woda 7 • Suma wpłat 6 lokali: ${zl(r.gross)}`, 50, H - 30, W - 100);
+
+  const safeNum = r.num.replace(/[^a-zA-Z0-9_-]/g, '_');
+  savePdfBlob(canvasToPdfBlob(canvas), `Woda7_Rozliczenie_${safeNum}.pdf`);
+}
+
+function exportStatsToPDF() {
+  const hist = sortChronologically(state.history);
+  if (!hist.length) {
+    showMsg('Brak zapisanych faktur w Bazie do wygenerowania PDF.', 'warn');
+    return;
+  }
+
+  const totals = {};
+  UNITS.forEach(u => { totals[u] = { m3: 0, zl: 0, uchybM3: 0, days: 0, virtualMeter: 0, rawMeter: 0, carry: 0 }; });
+  hist.forEach(h => {
+    const d = h.days || Math.max(1, daysBetween(h.from, h.to));
+    (h.units || []).forEach(u => {
+      if (!totals[u.u]) return;
+      totals[u.u].m3 += (u.normUse ?? u.use ?? 0);
+      totals[u.u].zl += (u.totalCost ?? u.tot ?? 0);
+      totals[u.u].uchybM3 += (u.uchybM3 ?? 0);
+      totals[u.u].days += d;
+      totals[u.u].virtualMeter = u.virtualCurr ?? totals[u.u].m3;
+      totals[u.u].rawMeter = u.rawMeterCurr ?? totals[u.u].virtualMeter;
+      totals[u.u].carry = u.carryoverNext ?? 0;
+    });
+  });
+
+  const W = 1240;
+  const H = 1754;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(50, 45, W - 100, 125);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 32px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('WODA 7 – STATYSTYKI I LICZNIKI', 80, 98, W - 160);
+  ctx.fillStyle = '#93c5fd';
+  ctx.font = '600 20px sans-serif';
+  ctx.fillText(`Liczba rozliczonych faktur: ${hist.length}   •   Zakres: ${fmtDate(hist[0].from)} – ${fmtDate(hist[hist.length - 1].to)}`, 80, 140, W - 160);
+
+  let y = 205;
+  ctx.fillStyle = '#0f172a';
+  ctx.font = 'bold 23px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('1. Skumulowane stany liczników i koszty lokali', 50, y);
+  y += 18;
+
+  ctx.fillStyle = '#e2e8f0';
+  ctx.fillRect(50, y, W - 100, 50);
+  ctx.fillStyle = '#1e293b';
+  ctx.font = 'bold 17px sans-serif';
+
+  const cols1 = [
+    { name: 'Lokal', x: 70, align: 'left', maxW: 115 },
+    { name: 'Fiz. tarcza', x: 335, align: 'right', maxW: 135 },
+    { name: 'Wirt. licznik', x: 505, align: 'right', maxW: 145 },
+    { name: 'Bilans m³', x: 665, align: 'right', maxW: 135 },
+    { name: 'Śr. l/dobę', x: 815, align: 'right', maxW: 125 },
+    { name: 'Uchyb suma', x: 985, align: 'right', maxW: 145 },
+    { name: 'Suma opłat zł', x: 1170, align: 'right', maxW: 160 }
+  ];
+  cols1.forEach(c => {
+    ctx.textAlign = c.align;
+    ctx.fillText(c.name, c.x, y + 32, c.maxW);
+  });
+
+  y += 50;
+  UNITS.forEach((u, idx) => {
+    const t = totals[u];
+    const lPerDay = t.days > 0 ? Math.round((t.m3 * 10) / t.days) : 0;
+    const cStr = t.carry === 0 ? '0,00 m³' : (t.carry > 0 ? '+' + m3(t.carry) : m3(t.carry));
+    ctx.fillStyle = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
+    ctx.fillRect(50, y, W - 100, 52);
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(50, y, W - 100, 52);
+
+    ctx.font = 'bold 19px sans-serif';
+    ctx.fillStyle = '#0f172a'; ctx.textAlign = 'left'; ctx.fillText(`Lokal ${u}`, 70, y + 33, 115);
+
+    ctx.font = '600 18px sans-serif';
+    ctx.fillStyle = '#334155'; ctx.textAlign = 'right'; ctx.fillText(m3(t.rawMeter), 335, y + 33, 135);
+
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillStyle = '#1e3a8a'; ctx.fillText(m3(t.virtualMeter), 505, y + 33, 145);
+
+    ctx.fillStyle = t.carry !== 0 ? '#d97706' : '#64748b'; ctx.fillText(cStr, 665, y + 33, 135);
+
+    ctx.font = '600 18px sans-serif';
+    ctx.fillStyle = '#334155'; ctx.fillText(`${lPerDay} l/d`, 815, y + 33, 125);
+    ctx.fillText((t.uchybM3 > 0 ? '+' : '') + m3(t.uchybM3), 985, y + 33, 145);
+
+    ctx.font = 'bold 19px sans-serif';
+    ctx.fillStyle = '#059669'; ctx.fillText(zl(t.zl), 1170, y + 33, 160);
+    y += 52;
+  });
+
+  y += 50;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#0f172a';
+  ctx.font = 'bold 23px sans-serif';
+  ctx.fillText('2. Historia faktur i uchybu (Licznik główny vs Suma lokali)', 50, y);
+  y += 18;
+
+  ctx.fillStyle = '#e2e8f0';
+  ctx.fillRect(50, y, W - 100, 48);
+  ctx.fillStyle = '#1e293b';
+  ctx.font = 'bold 17px sans-serif';
+
+  const cols2 = [
+    { name: 'Nr faktury', x: 70, align: 'left', maxW: 205 },
+    { name: 'Okres rozliczeniowy', x: 290, align: 'left', maxW: 270 },
+    { name: 'Główny m³', x: 710, align: 'right', maxW: 130 },
+    { name: 'Lokale m³', x: 860, align: 'right', maxW: 130 },
+    { name: 'Uchyb (%)', x: 1025, align: 'right', maxW: 150 },
+    { name: 'Kwota brutto', x: 1170, align: 'right', maxW: 135 }
+  ];
+  cols2.forEach(c => {
+    ctx.textAlign = c.align;
+    ctx.fillText(c.name, c.x, y + 31, c.maxW);
+  });
+  y += 48;
+
+  [...hist].reverse().slice(0, 14).forEach((h, i) => {
+    const uM3 = h.uchybTotalM3 ?? h.uchybM3 ?? 0;
+    const pct = h.main > 0 ? ((uM3 / h.main) * 100).toFixed(1) : '0.0';
+    ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#f8fafc';
+    ctx.fillRect(50, y, W - 100, 46);
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(50, y, W - 100, 46);
+
+    ctx.font = 'bold 17px sans-serif';
+    ctx.fillStyle = '#0f172a';
+    ctx.textAlign = 'left';
+    ctx.fillText(String(h.num), 70, y + 29, 205);
+
+    ctx.font = '500 17px sans-serif';
+    ctx.fillStyle = '#334155';
+    ctx.fillText(`${fmtDate(h.from)} – ${fmtDate(h.to)} (${h.days} dni)`, 290, y + 29, 270);
+
+    ctx.font = '600 17px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(m3(h.main), 710, y + 29, 130);
+    ctx.fillText(m3(h.totalNormM3), 860, y + 29, 130);
+
+    ctx.font = 'bold 17px sans-serif';
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fillText(`${uM3 > 0 ? '+' : ''}${m3(uM3)} (${pct}%)`, 1025, y + 29, 150);
+
+    ctx.fillStyle = '#059669';
+    ctx.fillText(zl(h.gross), 1170, y + 29, 135);
+    y += 46;
+  });
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '500 16px sans-serif';
+  ctx.fillText(`Wygenerowano w aplikacji Woda 7 (${new Date().toISOString().slice(0, 10)})`, 50, H - 30, W - 100);
+
+  savePdfBlob(canvasToPdfBlob(canvas), `Woda7_Statystyki_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
+$('btn-save-pdf-rep').addEventListener('click', exportReportToPDF);
+$('btn-save-pdf-stat').addEventListener('click', exportStatsToPDF);
+$('btn-edit-current').addEventListener('click', () => {
+  const r = state.currentReport;
+  if (!r) return;
+  const inDb = state.history.find(h => h.num === r.num);
+  if (inDb) {
+    editHistoryRecord(inDb.id);
+  } else {
+    switchTab(2);
+  }
+});
+
+$('btn-stat-tsv').addEventListener('click', () => {
+  if (!state.history.length) return;
+  const hist = sortChronologically(state.history);
+  const totals = {};
+  UNITS.forEach(u => { totals[u] = { m3: 0, zl: 0, uchybM3: 0, days: 0, virtualMeter: 0, rawMeter: 0, carry: 0 }; });
+  hist.forEach(h => {
+    const d = h.days || Math.max(1, daysBetween(h.from, h.to));
+    (h.units || []).forEach(u => {
+      if (!totals[u.u]) return;
+      totals[u.u].m3 += (u.normUse ?? u.use ?? 0);
+      totals[u.u].zl += (u.totalCost ?? u.tot ?? 0);
+      totals[u.u].uchybM3 += (u.uchybM3 ?? 0);
+      totals[u.u].days += d;
+      totals[u.u].virtualMeter = u.virtualCurr ?? totals[u.u].m3;
+      totals[u.u].rawMeter = u.rawMeterCurr ?? totals[u.u].virtualMeter;
+      totals[u.u].carry = u.carryoverNext ?? 0;
+    });
+  });
+  const header = ['Lokal', 'Fizyczna_tarcza_m3', 'Wirtualny_licznik_m3', 'Bilans_m3', 'Suma_zuzycia_m3', 'Srednie_l_dobe', 'Uchyb_lacznie_m3', 'Suma_oplat_zl'].join('\t');
+  const rows = UNITS.map(u => {
+    const t = totals[u];
+    const lPerDay = t.days > 0 ? Math.round((t.m3 * 10) / t.days) : 0;
+    return [u, fmt2(t.rawMeter), fmt2(t.virtualMeter), fmt2(t.carry), fmt2(t.m3), lPerDay, fmt2(t.uchybM3), fmt2(t.zl)].join('\t');
+  });
+  copyOrShare([header, ...rows].join('\n'), true, '📊 Skopiowano statystyki w formacie TSV (do wklejenia w Excelu)!');
+});
+
+$('btn-save-db').addEventListener('click', () => {
+  const r = state.currentReport;
+  if (!r || r.saved) return;
+  const idx = state.history.findIndex(h => h.num === r.num);
+  if (idx >= 0) {
+    if (!confirm(`Faktura ${r.num} już istnieje w Bazie. Nadpisać ją i przeliczyć historię?`)) return;
+    state.history.splice(idx, 1);
+  }
+  r.saved = true;
+  state.history.push(JSON.parse(JSON.stringify(r)));
+  state.manualPrevMeters = {};
+  saveDatabase();
+  state.currentReport = state.history.find(h => h.num === r.num) || r;
+  renderReport();
+  renderUnitsForm();
+  showMsg('✅ Rozliczenie zapisane w Bazie! Ciągłość wirtualnych liczników i dat została zaktualizowana.', 'ok');
+});
+
+$('btn-new').addEventListener('click', () => {
+  if (!confirm('Rozpocząć nowe rozliczenie? Pola formularza zostaną wyczyszczone, a stany poprzednie i data początkowa pobrane z ostatniej faktury w Bazie.')) return;
+  localStorage.removeItem(DRAFT_KEY);
+  ['f-num', 'f-from', 'f-to', 'f-main', 'f-sub', 'f-wat', 'f-sew', 'f-watsew', 'f-gross'].forEach(id => {
+    if ($(id)) {
+      $(id).value = '';
+      $(id).classList.remove('autofilled', 'manual-edit');
+    }
+  });
+  state.lastSyncedInvTo = '';
+  state.invoiceIssueDate = '';
+  state.manualPrevMeters = {};
+  $('inv-file-info').style.display = 'none';
+  $('pdf-preview-wrap').hidden = true;
+  state.currentReport = null;
+  updateInvoicePreview();
+  renderUnitsForm();
+  switchTab(1);
+});
+
+$('btn-clear-db').addEventListener('click', () => {
+  if (!state.history.length) return;
+  if (!confirm('Czy na pewno wyczyścić całą Bazę rozliczeń?')) return;
+  state.history = [];
+  state.currentReport = null;
+  saveDatabase();
+  renderHistory();
+  renderStats();
+  updateInvoicePreview();
+  renderUnitsForm();
+  showMsg('🗑 Wyczyszczono bazę rozliczeń.', 'ok');
+});
+
+$('btn-export-file').addEventListener('click', exportDatabaseWithPicker);
+$('btn-import-file').addEventListener('click', () => $('file-db-import').click());
+$('file-db-import').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const parsed = JSON.parse(await file.text());
+    const list = parsed.history || parsed.database;
+    if (!Array.isArray(list)) throw new Error('Invalid format');
+    if (!confirm(`Wczytać ${list.length} rozliczeń z pliku? Obecna historia w telefonie zostanie zastąpiona.`)) return;
+    state.history = list;
+    saveDatabase();
+    renderHistory();
+    updateInvoicePreview();
+    renderUnitsForm();
+    showMsg(`✅ Pomyślnie zaimportowano i przeliczono bazę danych (${list.length} faktur).`, 'ok');
+  } catch (err) {
+    showMsg('Wybrany plik nie jest poprawną kopią bazy danych (.json).', 'err');
+  }
+});
+
+// Start aplikacji
+loadDatabase();
+updateInvoicePreview();
+renderUnitsForm();
+restoreDraft();
+if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
